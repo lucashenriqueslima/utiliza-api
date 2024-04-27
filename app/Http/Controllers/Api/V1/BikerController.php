@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\BikerStatus;
+use App\Enums\CallRequestStatus;
 use App\Enums\CallStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Biker;
 use App\Models\Call;
 use App\Models\CallRequest;
 use App\Services\Firebase\FirebaseService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +18,6 @@ class BikerController extends Controller
 {
     public function index(Call $call)
     {
-
         $bikers = DB::select(
             'SELECT bikers.id,
             firebase_token,
@@ -24,32 +25,42 @@ class BikerController extends Controller
             FROM biker_geolocations 
             INNER JOIN bikers ON bikers.id = biker_geolocations.biker_id
             WHERE bikers.status = ? 
-            AND biker_geolocations.updated_at > NOW() - INTERVAL 1 MINUTE
+            -- AND biker_geolocations.updated_at > NOW() - INTERVAL 100 MINUTE
             ORDER BY distance', 
         [
-            $call->location->latitude,
             $call->location->longitude,
+            $call->location->latitude,
             BikerStatus::Avaible->value
         ]
 
-
-
         );
+        $firebaseService = new FirebaseService($call);
 
         foreach ($bikers as $biker) {
-            (new FirebaseService())->sendPushNotification(
-                $biker->firebase_token
+
+            dd($biker->distance);
+            $callRequest = CallRequest::create([
+                'call_id' => $call->id,
+                'biker_id' => $biker->id,
+            ]);
+
+            $firebaseService->sendPushNotification(
+                $callRequest->id,
+                $biker->firebase_token,
+                number_format($biker->distance / 1000, 1),
+                Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(8)
             );
 
-            if($call->refresh()->status != CallStatus::InService->value) {
-                CallRequest::create([
-                    'call_id' => $call->id,
-                    'biker_id' => $biker->id
-                ]);
-                continue;
-            }
+            sleep(10);
 
-            break;
+            if($callRequest->refresh()->status == CallRequestStatus::Accepted->value) {
+                break;
+            }
+            
+            $callRequest->update([
+                'status' => CallRequestStatus::NotAnsewered->value
+            ]);
+            
         }
     }
 
@@ -66,7 +77,7 @@ class BikerController extends Controller
     public function updateStatus(Request $request, Biker $biker)
     {
         $request->validate([
-            'status' => 'required|in:avaible,not_avaible',
+            'status' => 'required|in:avaible,not_avaible,busy',
         ]);
 
         $biker->update(

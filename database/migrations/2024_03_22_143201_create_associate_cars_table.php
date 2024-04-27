@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('associate_cars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('associate_id')->constrained('associates');
-            $table->bigInteger('ileva_associate_vehicle_id');
+            $table->bigInteger('ileva_associate_vehicle_id')->nullable();
             $table->string('plate');
             $table->string('brand');
             $table->string('model');
             $table->string('color');
+            $table->string('year');
             $table->timestamps();
         });
     }

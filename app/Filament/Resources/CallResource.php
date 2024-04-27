@@ -2,21 +2,35 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\CallStatus;
 use App\Filament\Resources\CallResource\Pages;
-use App\Filament\Resources\CallResource\RelationManagers;
+use App\Helpers\FormatHelper;
+use App\Models\Associate;
+use App\Models\AssociateCar;
 use App\Models\Call;
 use App\Models\Ileva\IlevaAssociate;
 use App\Models\Ileva\IlevaAssociateVehicle;
-use Filament\Forms;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Cheesegrits\FilamentGoogleMaps\Fields\Map;
+use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
+use Filament\Actions\ActionGroup;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
+use Filament\Tables\Actions\Action;
+
+use function PHPSTORM_META\map;
 
 class CallResource extends Resource
 {
@@ -28,40 +42,157 @@ class CallResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('associate_id')
+                Hidden::make('temp_associate_id')
+                    ->live(),
+                Hidden::make('temp_associate_car_id')
+                    ->live(),
+                Section::make()->columns(2)->schema([
+                    Select::make('associate_id')
                     ->label('Associado')
                     ->placeholder('Selecione um associado')
                     ->searchable()
-                    ->searchDebounce(250)
-                    ->required()
+                    ->searchDebounce(300)
+                    ->required(fn (Get $get) => (!$get('temp_associate_id')))
+                    ->disabled(fn (Get $get) => ($get('temp_associate_id')))
                     ->live()
+                    ->createOptionForm([
+                        Section::make('Associado')
+                        ->description('Caso o associado não esteja cadastrado, preencha os campos abaixo para criar um novo.')
+                        ->columns(2)
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Nome')
+                                ->columnSpan(2)
+                                ->required(),
+                            TextInput::make('phone')
+                                ->label('Telefone')
+                                ->mask('(99) 99999-9999')
+                                ->length(15)
+                                ->required(),
+                            TextInput::make('cpf')
+                                ->label('CPF')
+                                ->mask('999.999.999-99')
+                                ->length(14)
+                                ->required(),
+                        ]),
+                        Section::make('Carro do Associado')
+                        ->columns(2)
+                        ->schema([
+                            TextInput::make('model')
+                            ->label('Modelo')
+                            ->columnSpan(2)
+                            ->required(),
+                            TextInput::make('plate')
+                                ->label('Placa')
+                                ->required(),
+                            TextInput::make('brand')
+                                ->label('Marca')
+                                ->required(),
+                            TextInput::make('color')
+                                ->label('Cor')
+                                ->required(),
+                            TextInput::make('year')
+                                ->label('Ano')
+                                ->numeric()
+                                ->length(4)
+                                ->required(),
+                        ]),
+                        
+                    ])
+                    ->createOptionUsing(function (array $data, Set $set): string {
+                        $associate = Associate::create([
+                            'name' => $data['name'],
+                            'phone' => $data['phone'],
+                            'cpf' => $data['cpf'],
+                        ]);
+
+                        $vehicle = $associate->car()->create([
+                            'model' => $data['model'],
+                            'plate' => $data['plate'],
+                            'brand' => $data['brand'],
+                            'color' => $data['color'],
+                            'year' => $data['year'],
+                        ]);
+
+                        $set('temp_associate_id', $associate->id);
+                        $set('temp_associate_car_id', $vehicle->id);
+
+                        Notification::make()
+                            ->title('Associado Criado')
+                            ->success()
+                            ->send();
+
+                        return 'Associado Criado';
+                    })
                     ->getSearchResultsUsing(fn (string $search): array => 
+
+
                         IlevaAssociate::select('hbrd_asc_associado.id', 'hbrd_asc_pessoa.nome')
+                        ->selectSub(function ($query) {
+                            $query->selectRaw('datediff(now(), ifnull(min(hbrd_finan_boleto.dt_vencimento), now()))')
+                                    ->from('hbrd_finan_boleto')
+                                    ->whereColumn('hbrd_finan_boleto.id_pessoa', 'hbrd_asc_pessoa.id')
+                                    ->where('situacao', 'Aberto')
+                                    ->where('hbrd_finan_boleto.dt_vencimento', '<', now())
+                                    ->groupBy('hbrd_finan_boleto.id_pessoa');
+                        }, 'days_without_payment')
                         ->join('hbrd_asc_pessoa', 'hbrd_asc_associado.id_pessoa', '=', 'hbrd_asc_pessoa.id')
                         ->orderBy('hbrd_asc_pessoa.nome')
-                        ->where('hbrd_asc_pessoa.nome', 'like', "%" . strtoupper($search) . "%")
+                        ->where('hbrd_asc_pessoa.nome', 'like', "%" . $search . "%")
                         ->limit(50)
-                        ->pluck('hbrd_asc_pessoa.nome', 'hbrd_asc_associado.id')
+                        ->get()
+                        ->mapWithKeys(fn ($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? 'Regularizado') ])
                         ->toArray()
                     )
                     ->getOptionLabelUsing(fn ($value) => IlevaAssociate::find($value)->person->nome ?? $value),
-                Forms\Components\Select::make('associate_vehicle_id')
+                Select::make('associate_vehicle_id')
                     ->label('Veículo')
                     ->placeholder('Selecione um veículo')
-                    ->required()
-                    ->disabled(fn (Get $get) => !$get('associate_id'))
+                    ->required(fn (Get $get) => (!$get('temp_associate_id')))
+                    ->disabled(fn (Get $get) => (!$get('associate_id') || $get('temp_associate_id')))
                     ->options(fn (Get $get): array => IlevaAssociateVehicle::where('id_associado', $get('associate_id'))
                                 ->pluck('placa', 'id')
                                 ->toArray())
-                    ->getOptionLabelUsing(fn ($value) => IlevaAssociateVehicle::find($value)->placa ?? $value),                
-                Forms\Components\TextInput::make('latitude')
-                    ->label('Latitude')
-                    ->required()
-                    ->regex('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'),
-                Forms\Components\TextInput::make('longitude')
-                    ->label('Longitude')
-                    ->regex('/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/')
-                    ->required(),
+                    ->getOptionLabelUsing(fn ($value) => IlevaAssociateVehicle::find($value)->placa ?? $value), 
+                ]),
+                
+                Section::make()->columns(1)->schema([
+                    Textarea::make('observation')
+                        ->label('Observação')
+                        ->placeholder('Digite uma observação...')
+                        ->autosize()
+                ]),
+
+                Section::make()->columns(1)->schema([
+                    Geocomplete::make('address')
+                        ->placeholder('Digite um endereço...')
+                        ->countries(['br'])
+                        ->geolocateIcon('heroicon-o-map')
+                        ->label('Endereço Completo')
+                        ->required(),
+                    Map::make('location')
+                        ->mapControls([
+                            'mapTypeControl'    => true,
+                            'scaleControl'      => true,
+                            'streetViewControl' => true,
+                            'rotateControl'     => true,
+                            'fullscreenControl' => true,
+                            'searchBoxControl'  => false, // creates geocomplete field inside map
+                            'zoomControl'       => false,
+                        ])
+                        ->height(fn () => '400px') // map height (width is controlled by Filament options)
+                        ->defaultZoom(12) // default zoom level when opening form
+                        ->autocomplete('address') // field on form to use as Places geocompletion field
+                        ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
+                        ->debug() // prints reverse geocode format strings to the debug console 
+                        ->defaultLocation([-16.6811204, -49.2567963]) // default for new forms
+                        ->draggable() // allow dragging to move marker
+                        ->clickable(true) // allow clicking to move marker
+                        ->geolocate(true) // adds a button to request device location and set map marker accordingly
+                        ->geolocateOnLoad(true, true)
+                        ->label('Localização')
+                ])
+
             ]);
     }
 
@@ -69,43 +200,104 @@ class CallResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('associateCar.associate.name')
+                TextColumn::make('associateCar.associate.name')
                     ->label('Associado')
                     ->searchable()
                     ->configure()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('associateCar.plate')
-                    ->label('Veículo')
+                TextColumn::make('associateCar.associate.cpf')
+                    ->label('CPF/CNPJ')
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('created_at')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('associateCar.associate.phone')
+                    ->label('Telefone')
+                    ->searchable()
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state): string => FormatHelper::phone($state))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('associateCar.plate')
+                    ->label('Placa')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('associateCar.model')
+                    ->label('Modelo')
+                    ->searchable()
+                    ->sortable(),                   
+                TextColumn::make('address')
+                    ->label('Endereço')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                 
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                 
+                        return $state;
+                    }),
+                TextColumn::make('status')
+                    ->label('Status')    
+                    ->searchable()
+                    ->sortable()
+                    ->badge(),
+                    TextColumn::make('location')
+                    ->label('Distância/Tempo')
+                    ->sortable()
+                    ->getStateUsing(function ($record) {
+    
+                        if($record->biker_id == null) return null;
+    
+                        $rawDistance = DB::select(
+                            'SELECT ST_Distance_Sphere(POINT(?, ?), bg.location) AS distance 
+                            FROM biker_geolocations AS bg                         
+                            WHERE bg.biker_id = ?', 
+                        [
+                            $record->location->longitude,
+                            $record->location->latitude,
+                            $record->biker_id
+                        ]);
+    
+                        $distance = number_format($rawDistance[0]->distance / 1000, 1);
+    
+                        
+                        return str_replace('.', ',', number_format($distance * 2) . " min ($distance km)");
+                    }),
+                TextColumn::make('created_at')
                     ->label('Data de Criação')
                     ->searchable()
                     ->sortable()
                     ->since(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Status')    
-                    ->badge(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->multiple()
                     ->options([
-                        'waiting_biker' => 'Buscando Motoboy',
+                        'searching_biker' => 'Buscando Motoboy',
+                        'waiting_arrival' => 'Aguardando Chegada',
                         'in_service' => 'Em Serviço',
-                        'done' => 'Concluído',
+                        'waiting_validation' => 'Aguardando Aprovação',
+                        'approved' => 'Aprovado',
                     ])
-                    ->default(['waiting_biker', 'in_service'])
-            ])->persistFiltersInSession()
+                    ->default(['searching_biker', 'waiting_arrival', 'waiting_validation'])
+            ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // ActionGroup::make([
+                //     Action::make('validate-main-expertise')
+                // ])
+                //     ->button()
+                //     ->label('Ações')
+                //     ->hidden(fn (Get $get) => $get('status') != CallStatus::WaitingValidation->value)
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
+            ])
+            ->poll('10s');
     }
 
     public static function getRelations(): array

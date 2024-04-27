@@ -8,34 +8,41 @@ use Filament\Support\Contracts\HasIcon;
 
 enum CallStatus: string implements HasLabel, HasColor, HasIcon
 {
-    case WaitingBiker = 'waiting_biker';
+    case SearchingBiker = 'searching_biker';
+    case WaitingArrival = 'waiting_arrival';
     case InService = 'in_service';
-    case Done = 'done';
+    case WaitingValidation = 'waiting_validation';
+    case Approved = 'approved';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::WaitingBiker => 'Buscando Motoboy',
-            self::InService => 'Em Serviço',
-            self::Done => 'Concluído',
+            self::SearchingBiker => 'Procurando motoboy',
+            self::WaitingArrival => 'Aguardando chegada',
+            self::InService => 'Em serviço',
+            self::WaitingValidation => 'Aguardando aprovação',
+            self::Approved => 'Aprovado',
         };
     }
 
     public function getColor(): string
     {
         return match ($this) {
-            self::WaitingBiker => 'warning',
+            self::SearchingBiker => 'gray',
+            self::WaitingArrival => 'warning',
             self::InService => 'info',
-            self::Done => 'success',
+            self::WaitingValidation => 'danger',
+            self::Approved => 'success',
         };
     }
 
     public function getIcon(): string
     {
         return match ($this) {
-            self::WaitingBiker => 'heroicon-o-magnifying-glass',
-            self::InService => 'heroicon-m-arrow-path',
-            self::Done => 'heroicon-m-check-badge',
+            self::SearchingBiker => 'heroicon-o-magnifying-glass',
+            self::WaitingArrival => 'heroicon-o-map-pin',
+            self::InService => 'heroicon-o-camera',
+            self::Approved => 'heroicon-m-check-badge',
         };
     }
 }

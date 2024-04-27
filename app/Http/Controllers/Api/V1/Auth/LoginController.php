@@ -40,8 +40,6 @@ class LoginController extends Controller
         $renter->authToken = null;
         $renter->save();
 
-        return response()->json([
-            'biker' => new BikerResource($biker),
-        ], 200);
+        return response()->json(new BikerResource($biker), 200);
     }
 }

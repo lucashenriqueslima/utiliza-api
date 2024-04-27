@@ -25,6 +25,34 @@ class Call extends Model
         ];
     }
 
+    // public function getLocationAttribute(): array
+    // {
+    //     return [
+    //         "lat" => (float)$this->location->latitude,
+    //         "lng" => (float)$this->location->longitude,
+    //     ];
+    // }
+
+    public static function getLatLngAttributes(): array
+    {
+        return [
+            'lat' => 'location.lat',
+            'lng' => 'location.lng',
+        ];
+    }
+
+   /**
+    * Get the name of the computed location attribute
+    *
+    * Used by the Filament Google Maps package.
+    *
+    * @return string
+    */
+    public static function getComputedLocation(): string
+    {
+        return 'map_location';
+    }
+
     public function associateCar(): BelongsTo
     {
         return $this->belongsTo(AssociateCar::class);

@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bikers', function (Blueprint $table) {
+        Schema::create('third_parties', function (Blueprint $table) {
             $table->id();
-            $table->string('locavibe_biker_id');
+            $table->foreignId('expertise_id')->constrained('expertises');
             $table->string('name');
-            $table->string('email');
-            $table->string('phone');
             $table->string('cpf');
-            $table->string('cnh');
-            $table->string('firebase_token')->nullable();
-            $table->enum('status', ['avaible', 'not_avaible', 'busy'])->default('avaible');
+            $table->string('phone');
             $table->timestamps();
         });
     }
@@ -30,6 +26,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bikers');
+        Schema::table('third_parties', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('expertise_id');
+        });
+        Schema::dropIfExists('third_parties');
     }
 };

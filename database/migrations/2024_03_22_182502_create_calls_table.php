@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('biker_id')->nullable()->constrained('bikers');
             $table->foreignId('associate_car_id')->constrained('associate_cars');
-            $table->bigInteger('ileva_associate_vehicle_id');
+            $table->string('address');
             $table->geometry('location', subtype: 'point')->nullable();
-            $table->enum('status', ['waiting_biker', 'in_service', 'done'])->default('waiting_biker');
+            $table->longText('observation')->nullable();
+            $table->enum('status', ['searching_biker', 'waiting_arrival', 'in_service', 'waiting_validation', 'approved'])->default('searching_biker');
+            $table->timestamp('biker_accepted_at')->nullable();
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */

@@ -3,6 +3,8 @@
 namespace App\Services\Firebase;
 
 use App\Dtos\FirebasePushNotificationDTO;
+use App\Models\Biker;
+use App\Models\Call;
 use Google_Client;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
@@ -14,23 +16,34 @@ class FirebaseService
     private string $googleApiUrl;
     private array $googleApiTokens;
 
-    public function __construct()
+    public function __construct(
+        private Call $call,
+    )
     {
         $this->googleClient = new Google_Client();
         $this->authWithGoogleApi();
         $this->client = Http::withHeaders($this->getHeaders());
     }
 
-    public function sendPushNotification(string $bikerFirebaseToken): void
+    public function sendPushNotification(string $callRequestId, string $bikerFirebaseToken, string $distance, string $createdAt): void
     {
         try {
-            $request = $this->client->post($this->googleApiUrl, [
+            $response = $this->client->post($this->googleApiUrl, [
                 'message' => [
                     'token' => $bikerFirebaseToken,
                     'notification' => [
                         'title' => 'NOVO CHAMADO!',
                         'body' => 'Você recebeu um novo chamado, clique para visualizar.',
                     ],  
+                    'data' => [
+                        'call_id' => (string)$this->call->id,
+                        'call_request_id' => (string)$callRequestId,
+                        'address' => $this->call->address,
+                        'distance' => str_replace('.', ',', $distance),
+                        'time' => (string) number_format($distance * 2),
+                        'price' => '50,00',
+                        'timeout_response' => (string) $createdAt,
+                    ],
                     'android' => [
                         'notification' => [
                             'sound' => 'notification.mp3',
@@ -40,7 +53,6 @@ class FirebaseService
                 ],
             ]);
 
-            dd($request);
         } catch (\Exception $e) {
             dd($e);
         }

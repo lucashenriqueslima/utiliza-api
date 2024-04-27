@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('call_requests', function (Blueprint $table) {
+        Schema::create('expertises', function (Blueprint $table) {
             $table->id();
             $table->foreignId('call_id')->constrained('calls');
-            $table->foreignId('biker_id')->constrained('bikers');
-            $table->enum('status', ['denied', 'accepted', 'not_answered'])->nullable();
+            $table->enum('type', ['main', 'final']);
+            $table->enum('status', ['canceled', 'done', 'waiting'])->nullable();
             $table->timestamps();
         });
     }
@@ -25,10 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('call_requests', function (Blueprint $table) {
+        Schema::table('expertises', function (Blueprint $table) {
             $table->dropConstrainedForeignId('call_id');
-            $table->dropConstrainedForeignId('biker_id');
         });
-        Schema::dropIfExists('call_requests');
+        Schema::dropIfExists('expertises');
     }
 };

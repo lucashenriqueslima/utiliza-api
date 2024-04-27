@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('associates', function (Blueprint $table) {
+        Schema::create('third_party_cars', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('ileva_associate_id')->nullable();
-            $table->string('name');
-            $table->string('email')->nullable();
-            $table->string('phone');
-            $table->string('cpf');
+            $table->bigInteger('ileva_fipe_brand_id');
+            $table->enum('vehicle_type', ['carro', 'moto', 'caminhao', 'outros']);
+            $table->string('fipe_code');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('associates');
+        Schema::dropIfExists('third_party_cars');
     }
 };
