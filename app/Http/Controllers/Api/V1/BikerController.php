@@ -18,50 +18,49 @@ class BikerController extends Controller
 {
     public function index(Call $call)
     {
-        $bikers = DB::select(
-            'SELECT bikers.id,
-            firebase_token,
-            ST_Distance_Sphere(POINT(?, ?), location) AS distance 
-            FROM biker_geolocations 
-            INNER JOIN bikers ON bikers.id = biker_geolocations.biker_id
-            WHERE bikers.status = ? 
-            -- AND biker_geolocations.updated_at > NOW() - INTERVAL 100 MINUTE
-            ORDER BY distance', 
-        [
-            $call->location->longitude,
-            $call->location->latitude,
-            BikerStatus::Avaible->value
-        ]
+        // $bikers = DB::select(
+        //     'SELECT bikers.id,
+        //     firebase_token,
+        //     ST_Distance_Sphere(POINT(?, ?), location) AS distance 
+        //     FROM biker_geolocations 
+        //     INNER JOIN bikers ON bikers.id = biker_geolocations.biker_id
+        //     WHERE bikers.status = ? 
+        //     -- AND biker_geolocations.updated_at > NOW() - INTERVAL 100 MINUTE
+        //     ORDER BY distance',
+        //     [
+        //         $call->location->longitude,
+        //         $call->location->latitude,
+        //         BikerStatus::Avaible->value
+        //     ]
 
-        );
-        $firebaseService = new FirebaseService($call);
+        // );
+        // $firebaseService = new FirebaseService($call);
 
-        foreach ($bikers as $biker) {
+        // foreach ($bikers as $biker) {
 
-            dd($biker->distance);
-            $callRequest = CallRequest::create([
-                'call_id' => $call->id,
-                'biker_id' => $biker->id,
-            ]);
+        //     dd($biker->distance);
+        //     $callRequest = CallRequest::create([
+        //         'call_id' => $call->id,
+        //         'biker_id' => $biker->id,
+        //     ]);
 
-            $firebaseService->sendPushNotification(
-                $callRequest->id,
-                $biker->firebase_token,
-                number_format($biker->distance / 1000, 1),
-                Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(8)
-            );
+        //     $firebaseService->sendPushNotification(
+        //         $callRequest->id,
+        //         $biker->firebase_token,
+        //         number_format($biker->distance / 1000, 1),
+        //         Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(8)
+        //     );
 
-            sleep(10);
+        //     sleep(10);
 
-            if($callRequest->refresh()->status == CallRequestStatus::Accepted->value) {
-                break;
-            }
-            
-            $callRequest->update([
-                'status' => CallRequestStatus::NotAnsewered->value
-            ]);
-            
-        }
+        //     if ($callRequest->refresh()->status == CallRequestStatus::Accepted->value) {
+        //         break;
+        //     }
+
+        //     $callRequest->update([
+        //         'status' => CallRequestStatus::NotAnsewered->value
+        //     ]);
+        // }
     }
 
     public function store(Request $request)
