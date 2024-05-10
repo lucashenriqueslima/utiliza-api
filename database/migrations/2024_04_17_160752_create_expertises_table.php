@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('expertises', function (Blueprint $table) {
             $table->id();
             $table->foreignId('call_id')->constrained('calls');
+            $table->integer('app_expertise_index');
             $table->enum('type', ['main', 'final']);
             $table->enum('status', ['canceled', 'done', 'waiting'])->nullable();
             $table->timestamps();

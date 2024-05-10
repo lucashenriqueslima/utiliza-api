@@ -15,11 +15,20 @@ return new class extends Migration
             $table->id();
             $table->foreignId('expertise_id')->constrained('expertises');
             $table->integer('fileable_id');
-            $table->string('fileable_type');
             $table->string('description')->nullable();
             $table->string('path');
-            $table->enum('image_type', ['plate', 'front_side', 'right_side', 'left_side', 'rear_side', 'street', 'others'])->nullable();
+            $table->enum('file_expertise_type', [
+                'report_audio',
+                'report_video',
+                'plate_image',
+                'front_side_image',
+                'right_side_image',
+                'left_side_image',
+                'rear_side_image',
+                'street_video',
+            ]);
             $table->enum('file_type', ['audio', 'image', 'video']);
+            $table->enum('status', ['approved', 'refused'])->nullable();
             $table->timestamps();
         });
     }
