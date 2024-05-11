@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('expertise_form_inputs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('expertise_id')->constrained('expertises');
-            $table->foreignId('expertise_file_id')->nullable()->constrained('expertise_files');
-            $table->integer('inputable_id');
-            $table->string('inputable_type');
             $table->enum('field_type', [
                 'report_text',
                 'name',
@@ -31,8 +28,8 @@ return new class extends Migration
                 'color',
                 'biker_observation',
             ]);
-            $table->enum('input_type', ['text', 'file', 'select']);
             $table->enum('status', ['approved', 'refused'])->nullable();
+            $table->string('refusal_description')->nullable();
             $table->timestamps();
         });
     }

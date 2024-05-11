@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('expertise_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('expertise_id')->constrained('expertises');
-            $table->integer('fileable_id');
-            $table->string('description')->nullable();
             $table->string('path');
             $table->enum('file_expertise_type', [
                 'report_audio',
@@ -29,6 +27,7 @@ return new class extends Migration
             ]);
             $table->enum('file_type', ['audio', 'image', 'video']);
             $table->enum('status', ['approved', 'refused'])->nullable();
+            $table->string('refusal_description')->nullable();
             $table->timestamps();
         });
     }
