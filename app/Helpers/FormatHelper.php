@@ -1,4 +1,4 @@
-<?php	
+<?php
 
 namespace App\Helpers;
 
@@ -7,7 +7,7 @@ class FormatHelper
     public static function cpfOrCnpj(string $cpfOrCnpj): string
     {
 
-        if(str_contains($cpfOrCnpj, '.')) {
+        if (str_contains($cpfOrCnpj, '.')) {
             return $cpfOrCnpj;
         }
 
@@ -21,5 +21,10 @@ class FormatHelper
     public static function phone(string $phone): string
     {
         return '(' . substr($phone, 0, 2) . ') ' . substr($phone, 2, 5) . '-' . substr($phone, 7, 4);
+    }
+
+    public static function onlyNumbers(string $value): string
+    {
+        return preg_replace('/[^0-9]/', '', $value);
     }
 }

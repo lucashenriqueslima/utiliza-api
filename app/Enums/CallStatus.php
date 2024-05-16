@@ -42,8 +42,8 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
             self::SearchingBiker => 'heroicon-o-magnifying-glass',
             self::WaitingArrival => 'heroicon-o-map-pin',
             self::InService => 'heroicon-o-camera',
+            self::WaitingValidation => 'heroicon-o-eye',
             self::Approved => 'heroicon-m-check-badge',
         };
     }
 }
-    

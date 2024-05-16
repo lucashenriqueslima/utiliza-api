@@ -41,13 +41,13 @@ class Call extends Model
         ];
     }
 
-   /**
-    * Get the name of the computed location attribute
-    *
-    * Used by the Filament Google Maps package.
-    *
-    * @return string
-    */
+    /**
+     * Get the name of the computed location attribute
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * @return string
+     */
     public static function getComputedLocation(): string
     {
         return 'map_location';
@@ -63,14 +63,18 @@ class Call extends Model
         return $this->belongsTo(Biker::class);
     }
 
+    public function expertises(): HasMany
+    {
+        return $this->hasMany(Expertise::class);
+    }
+
     public function ilevaAssociateVehicle(): BelongsTo
     {
-        return $this->belongsTo(IlevaAssociateVehicle::class, 'ileva_associate_vehicle_id' );
+        return $this->belongsTo(IlevaAssociateVehicle::class, 'ileva_associate_vehicle_id');
     }
 
     public function requests(): HasMany
     {
         return $this->hasMany(CallRequest::class);
     }
-    
 }

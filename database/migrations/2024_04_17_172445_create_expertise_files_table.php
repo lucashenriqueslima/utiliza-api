@@ -18,15 +18,14 @@ return new class extends Migration
             $table->enum('file_expertise_type', [
                 'report_audio',
                 'report_video',
-                'plate_image',
-                'front_side_image',
-                'right_side_image',
-                'left_side_image',
-                'rear_side_image',
-                'street_video',
+                'vehicle_plate_image',
+                'vehicle_front_side_image',
+                'vehicle_right_side_image',
+                'vehicle_left_side_image',
+                'vehicle_rear_side_image',
+                'vehicle_street_video',
             ]);
-            $table->enum('file_type', ['audio', 'image', 'video']);
-            $table->enum('status', ['approved', 'refused'])->nullable();
+            $table->boolean('is_approved')->nullable();
             $table->string('refusal_description')->nullable();
             $table->timestamps();
         });

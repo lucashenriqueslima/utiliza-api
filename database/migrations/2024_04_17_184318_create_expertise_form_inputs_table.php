@@ -28,7 +28,7 @@ return new class extends Migration
                 'color',
                 'biker_observation',
             ]);
-            $table->enum('status', ['approved', 'refused'])->nullable();
+            $table->boolean('is_approved')->nullable();
             $table->string('refusal_description')->nullable();
             $table->timestamps();
         });

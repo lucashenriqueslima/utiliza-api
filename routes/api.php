@@ -38,6 +38,6 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [LogoutController::class, 'destroy']);
         Route::get('/fipe/brand/{brandId}/model/{name?}', [FipeModelController::class, 'indexByBrandIdAndName']);
 
-        Route::post('call/{call}/expertises/create', [ExpertiseController::class, 'store']);
+        Route::post('call/{call}/expertise/create', [ExpertiseController::class, 'store']);
     });
 });

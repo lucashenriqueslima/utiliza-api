@@ -18,8 +18,7 @@ class FirebaseService
 
     public function __construct(
         private Call $call,
-    )
-    {
+    ) {
         $this->googleClient = new Google_Client();
         $this->authWithGoogleApi();
         $this->client = Http::withHeaders($this->getHeaders());
@@ -34,25 +33,24 @@ class FirebaseService
                     'notification' => [
                         'title' => 'NOVO CHAMADO!',
                         'body' => 'Você recebeu um novo chamado, clique para visualizar.',
-                    ],  
+                    ],
                     'data' => [
                         'call_id' => (string)$this->call->id,
                         'call_request_id' => (string)$callRequestId,
                         'address' => $this->call->address,
                         'distance' => str_replace('.', ',', $distance),
-                        'time' => (string) number_format($distance * 2),
+                        'time' => (string) number_format($distance * 4),
                         'price' => '50,00',
                         'timeout_response' => (string) $createdAt,
                     ],
                     'android' => [
                         'notification' => [
                             'sound' => 'notification.mp3',
-                            'channel_id' => 'com.example.locavibe_renter_app',
+                            'channel_id' => 'com.example.locavibe_renter_app-5',
                         ],
                     ],
                 ],
             ]);
-
         } catch (\Exception $e) {
             dd($e);
         }
@@ -60,17 +58,16 @@ class FirebaseService
 
     private function authWithGoogleApi(): void
     {
-        try{
-        $credentialsFilePath = "firebase/fcm.json";
-        $this->googleClient->setAuthConfig($credentialsFilePath);
-        $this->googleClient->addScope("https://www.googleapis.com/auth/firebase.messaging");
-        
-        $this->googleApiUrl = "https://fcm.googleapis.com/v1/projects/" . env('FIREBASE_APP_ID') . "/messages:send";
-        
-        $this->googleClient->fetchAccessTokenWithAssertion();
-        
-        $this->googleApiTokens = $this->googleClient->getAccessToken();
+        try {
+            $credentialsFilePath = "firebase/fcm.json";
+            $this->googleClient->setAuthConfig($credentialsFilePath);
+            $this->googleClient->addScope("https://www.googleapis.com/auth/firebase.messaging");
 
+            $this->googleApiUrl = "https://fcm.googleapis.com/v1/projects/" . env('FIREBASE_APP_ID') . "/messages:send";
+
+            $this->googleClient->fetchAccessTokenWithAssertion();
+
+            $this->googleApiTokens = $this->googleClient->getAccessToken();
         } catch (\Exception $e) {
             dd($e);
         }
@@ -83,6 +80,4 @@ class FirebaseService
             'Content-Type' => 'application/json; UTF-8',
         ];
     }
-
-    
 }

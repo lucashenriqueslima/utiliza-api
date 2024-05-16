@@ -25,7 +25,14 @@ class Associate extends Model
     protected function cpf(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => FormatHelper::cpfOrCnpj($value) 
+            set: fn (string $value) => FormatHelper::cpfOrCnpj($value)
+        );
+    }
+
+    protected function phone(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => FormatHelper::phone($value)
         );
     }
 

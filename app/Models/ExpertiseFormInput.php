@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class ExpertiseFormInput extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
 }
