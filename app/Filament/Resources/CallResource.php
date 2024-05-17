@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Enums\CallStatus;
 use App\Filament\Pages\ValidateExpertise;
+use App\Filament\Resources\CallResource\Actions\ExtractCoordinatesFromGoogleMapsUrl;
+use App\Filament\Resources\CallResource\Actions\ExtractCordinatesFromGoogleMapsUrl;
 use App\Filament\Resources\CallResource\Pages;
 use App\Helpers\FormatHelper;
 use App\Models\Associate;
@@ -163,7 +165,40 @@ class CallResource extends Resource
                         ->autosize()
                 ]),
 
+
+
                 Section::make()->columns(1)->schema([
+
+                    TextInput::make('link_google_maps')
+                    ->label('Link Google Maps')
+                    ->placeholder('Cole o link do Google Maps aqui...')
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set): void {
+
+                        if(!$state) {
+                            return;
+                        }
+
+                        $coordinates = ExtractCoordinatesFromGoogleMapsUrl::execute($state);
+
+                        if(!$coordinates) {
+                            Notification::make()
+                            ->title('Link inválido, confira e tente novamente')
+                            ->warning()
+                            ->send();
+
+                            return;
+                        }
+
+                        Notification::make()
+                        ->title('Coordenadas extraídas com sucesso!')
+                        ->success()
+                        ->send();
+
+                            $set('location', $coordinates);
+                        
+                    }),
+
                     Geocomplete::make('address')
                         ->placeholder('Digite um endereço...')
                         ->countries(['br'])
@@ -182,7 +217,10 @@ class CallResource extends Resource
                         ])
                         ->height(fn () => '400px') // map height (width is controlled by Filament options)
                         ->defaultZoom(12) // default zoom level when opening form
-                        ->autocomplete('address') // field on form to use as Places geocompletion field
+                        ->autocomplete(
+                            fieldName: 'address',
+                            countries: ['BR']
+                        ) // field on form to use as Places geocompletion field
                         ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
                         ->debug() // prints reverse geocode format strings to the debug console 
                         ->defaultLocation([-16.6811204, -49.2567963]) // default for new forms
