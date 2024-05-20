@@ -17,7 +17,7 @@ class FirebaseService
     private array $googleApiTokens;
 
     public function __construct(
-        private Call $call,
+        private Call $call
     ) {
         $this->googleClient = new Google_Client();
         $this->authWithGoogleApi();

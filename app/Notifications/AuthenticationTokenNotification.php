@@ -15,7 +15,7 @@ class AuthenticationTokenNotification extends Notification
      * Create a new notification instance.
      */
     public function __construct(public string $token)
-    {        
+    {
     }
 
     /**
@@ -34,8 +34,9 @@ class AuthenticationTokenNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('Um novo token de autenticação foi gerado para você.')
-                    ->line('Seu token é: ' . $this->token);
+            ->subject('Token de autenticação')
+            ->line('Um novo token de autenticação foi gerado para você.')
+            ->line('Seu token é: ' . $this->token);
     }
 
     /**
