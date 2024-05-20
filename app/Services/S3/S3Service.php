@@ -12,6 +12,11 @@ class S3Service
     {
     }
 
+    public static function getUrl(string $filePath): string
+    {
+        return Storage::url($filePath);
+    }
+
     public function uploadFile($file)
     {
         try {
@@ -19,5 +24,10 @@ class S3Service
         } catch (S3Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    public function getFileUrl($file): string
+    {
+        return Storage::url($file);
     }
 }

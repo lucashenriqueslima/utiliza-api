@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ExpertiseFileType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,13 +14,17 @@ class ExpertiseFile extends Model
 
     protected $guarded = [];
 
+    protected function casts(): array
+    {
+        return [
+            'is_approved' => 'boolean',
+            'file_expertise_type' => ExpertiseFileType::class,
+        ];
+    }
+
     public function expertise(): BelongsTo
     {
         return $this->belongsTo(Expertise::class);
     }
 
-    public function fileable(): MorphTo
-    {
-        return $this->morphTo();
-    }
 }

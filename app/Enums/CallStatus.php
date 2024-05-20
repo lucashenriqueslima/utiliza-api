@@ -36,6 +36,7 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
         };
     }
 
+
     public function getIcon(): string
     {
         return match ($this) {

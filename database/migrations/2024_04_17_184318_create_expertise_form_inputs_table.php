@@ -15,18 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('expertise_id')->constrained('expertises');
             $table->enum('field_type', [
-                'report_text',
                 'name',
                 'cpf',
                 'phone',
                 'plate',
-                'chassi',
-                'renavam',
-                'brand',
-                'model',
-                'year',
-                'color',
-                'biker_observation',
             ]);
             $table->boolean('is_approved')->nullable();
             $table->string('refusal_description')->nullable();

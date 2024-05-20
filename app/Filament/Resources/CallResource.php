@@ -196,7 +196,7 @@ class CallResource extends Resource
                         ->send();
 
                             $set('location', $coordinates);
-                        
+
                     }),
 
                     Geocomplete::make('address')
@@ -222,7 +222,7 @@ class CallResource extends Resource
                             countries: ['BR']
                         ) // field on form to use as Places geocompletion field
                         ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
-                        ->debug() // prints reverse geocode format strings to the debug console 
+                        ->debug() // prints reverse geocode format strings to the debug console
                         ->defaultLocation([-16.6811204, -49.2567963]) // default for new forms
                         ->draggable() // allow dragging to move marker
                         ->clickable(true) // allow clicking to move marker
@@ -296,8 +296,8 @@ class CallResource extends Resource
                         if ($record->biker_id == null) return null;
 
                         $rawDistance = DB::select(
-                            'SELECT ST_Distance_Sphere(POINT(?, ?), bg.location) AS distance 
-                            FROM biker_geolocations AS bg                         
+                            'SELECT ST_Distance_Sphere(POINT(?, ?), bg.location) AS distance
+                            FROM biker_geolocations AS bg
                             WHERE bg.biker_id = ?',
                             [
                                 $record->location->longitude,
