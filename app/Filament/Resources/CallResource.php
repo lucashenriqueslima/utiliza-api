@@ -13,6 +13,7 @@ use App\Models\AssociateCar;
 use App\Models\Call;
 use App\Models\Ileva\IlevaAssociate;
 use App\Models\Ileva\IlevaAssociateVehicle;
+use App\Services\CallService;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -179,7 +180,7 @@ class CallResource extends Resource
                             return;
                         }
 
-                        $coordinates = ExtractCoordinatesFromGoogleMapsUrl::execute($state);
+                        $coordinates = CallService::extractCoordinatesFromGoogleMapsUrl($state);
 
                         if(!$coordinates) {
                             Notification::make()

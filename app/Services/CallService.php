@@ -1,15 +1,15 @@
 <?php
 
-    namespace App\Filament\Resources\CallResource\Actions;
+    namespace App\Services;
 
-class ExtractCoordinatesFromGoogleMapsUrl 
+class CallService
 {
-    public static function execute(string $url): ?array
+    public static function extractCoordinatesFromGoogleMapsUrl(string $url): ?array
     {
-        {
+
             $pattern2 = '/maps\?q=(-?\d+\.\d+),(-?\d+\.\d+)/';
             $pattern1 = '/3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/';
-            
+
             if (preg_match($pattern1, $url, $matches)) {
                 $latitude = $matches[1];
                 $longitude = $matches[2];
@@ -21,11 +21,11 @@ class ExtractCoordinatesFromGoogleMapsUrl
             } else {
                 return null;
             }
-    
+
             return [
                 'lat' => floatval($latitude),
                 'lng' => floatval($longitude)
             ];
-        }
+
     }
-} 
+}
