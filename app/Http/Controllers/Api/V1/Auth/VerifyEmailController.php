@@ -22,7 +22,7 @@ class VerifyEmailController extends Controller
             $renter = LocavibeRenter::where('cpf', $request->cpf)->firstOrFail();
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Email não encontrado'
+                'message' => 'CPF não encontrado'
             ], 404);
         }
 
