@@ -40,6 +40,8 @@ class CallResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
     protected static ?string $modelLabel = 'Chamado';
 
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -171,34 +173,33 @@ class CallResource extends Resource
                 Section::make()->columns(1)->schema([
 
                     TextInput::make('link_google_maps')
-                    ->label('Link Google Maps')
-                    ->placeholder('Cole o link do Google Maps aqui...')
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $set): void {
+                        ->label('Link Google Maps')
+                        ->placeholder('Cole o link do Google Maps aqui...')
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set): void {
 
-                        if(!$state) {
-                            return;
-                        }
+                            if (!$state) {
+                                return;
+                            }
 
-                        $coordinates = CallService::extractCoordinatesFromGoogleMapsUrl($state);
+                            $coordinates = CallService::extractCoordinatesFromGoogleMapsUrl($state);
 
-                        if(!$coordinates) {
+                            if (!$coordinates) {
+                                Notification::make()
+                                    ->title('Link inválido, confira e tente novamente')
+                                    ->warning()
+                                    ->send();
+
+                                return;
+                            }
+
                             Notification::make()
-                            ->title('Link inválido, confira e tente novamente')
-                            ->warning()
-                            ->send();
-
-                            return;
-                        }
-
-                        Notification::make()
-                        ->title('Coordenadas extraídas com sucesso!')
-                        ->success()
-                        ->send();
+                                ->title('Coordenadas extraídas com sucesso!')
+                                ->success()
+                                ->send();
 
                             $set('location', $coordinates);
-
-                    }),
+                        }),
 
                     Geocomplete::make('address')
                         ->placeholder('Digite um endereço...')
@@ -338,7 +339,7 @@ class CallResource extends Resource
                         'waiting_validation' => 'Aguardando Aprovação',
                         'approved' => 'Aprovado',
                     ])
-                    ->default(['searching_biker', 'waiting_arrival', 'waiting_validation'])
+                    ->default(['searching_biker', 'waiting_arrival', 'waiting_validation', 'in_service'])
             ])
             ->actions([
                 Action::make('validate_expertise')
@@ -346,8 +347,7 @@ class CallResource extends Resource
                     ->button()
                     ->icon('heroicon-o-eye')
                     ->color('danger')
-                    ->url(fn (Call $record): string => self::getUrl('validate', ['record' => $record]))
-                    ->openUrlInNewTab()
+                    ->url(fn (Call $record): string => self::getUrl('validate', ['callId' => $record]))
                     ->hidden(fn (Call $call): bool => $call->status != CallStatus::WaitingValidation)
             ])
             ->bulkActions([
@@ -370,7 +370,7 @@ class CallResource extends Resource
         return [
             'index' => Pages\ListCalls::route('/'),
             'create' => Pages\CreateCall::route('/create'),
-            'validate' => Pages\ValidateExpertise::route('/{record}/expertises/validate'),
+            'validate' => Pages\ValidateExpertise::route('/{callId}/expertises/validate'),
         ];
     }
 }

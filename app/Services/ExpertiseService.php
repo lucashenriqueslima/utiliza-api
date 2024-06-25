@@ -3,60 +3,59 @@
 namespace App\Services;
 
 use App\Enums\S3Prefix;
+use App\Jobs\Expertise\UploadExpertiseFileJob;
 use App\Models\Expertise;
 use App\Services\S3\S3Service;
+use Aws\S3\Exception\S3Exception;
 use Illuminate\Http\Request;
 use Laravel\Octane\Facades\Octane;
 
 class ExpertiseService
 {
-    private S3Service $s3Service;
-    public function __construct()
+
+    public static function handleExpertiseThirdPartyFormTexts(Request $request, Expertise $expertise)
     {
-        $this->s3Service = new S3Service(S3Prefix::Expertise);
-    }
-    public function verifyExpertiseMainFormFiles()
-    {
-    }
-    public function handleExpertiseMainFormFiles($files, Expertise $expertise): void
-    {
-
-        $audioPath = $this->s3Service->uploadFile($files['audio']['file']);
-        $videoPath = $this->s3Service->uploadFile($files['video']['file']);
-        $this->uploadImages($files['images'], $expertise);
+        $thirdParty = $expertise->thirdParty()->create([
+            'name' => $request->name,
+            'cpf' => $request->cpf,
+            'phone' => $request->phone,
+        ]);
 
 
-        // [$audioPath, $videoPath, $imagesPath] = Octane::concurrently(
-        //     [
-        //         fn () => $this->s3Service->uploadFile($files['audio']['file']),
-        //         fn () => $this->s3Service->uploadFile($files['video']['file']),
-        //         fn () => $this->uploadImages($files['images']),
-
-        //     ]
-        // );
-
-        $expertise->files()->createMany([
-            ['file_expertise_type' => $files['audio']['expertise_file_type'], 'path' => $audioPath],
-            ['file_expertise_type' => $files['video']['expertise_file_type'], 'path' => $videoPath],
+        $thirdParty->car()->create([
+            'plate' => $request->plate,
         ]);
     }
 
-    public function uploadImages(array $images, Expertise $expertise): void
+    public static function handleExpertiseMainFormFiles(Request $request, Expertise $expertise): void
     {
-        $imagePath = '';
-        foreach ($images as $image) {
-            $imagePath = $this->s3Service->uploadFile($image['file']);
+        $s3service = new S3Service(S3Prefix::Expertise);
 
-            $expertise->files()->create(
-                [
-                    'file_expertise_type' => $image['expertise_file_type'],
-                    'path' => $imagePath
-                ]
-            );
+        self::uploadFile($request->video, $expertise, $s3service);
+
+        foreach ($request->images as $image) {
+            self::uploadFile($image, $expertise, $s3service);
         }
     }
 
-    public function storeExpertiseFile(string $path)
+    private static function uploadFile(array $file, Expertise $expertise, S3Service $s3Service): void
     {
+        try {
+            $filePath = $s3Service->uploadFile($file['file']);
+
+            $expertise->files()->create(
+                [
+                    'file_expertise_type' => $file['file_type'],
+                    'path' => $filePath
+                ],
+            );
+        } catch (S3Exception $e) {
+            $expertise->files()->create(
+                [
+                    'file_expertise_type' => $file['file_type'],
+                    'error_message' => $e->getMessage()
+                ],
+            );
+        };
     }
 }

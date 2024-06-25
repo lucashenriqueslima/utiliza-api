@@ -2,81 +2,66 @@
 
 namespace App\Services\Firebase;
 
-use App\Dtos\FirebasePushNotificationDTO;
 use App\Models\Biker;
 use App\Models\Call;
+use App\Models\CallRequest;
+use AWS\CRT\Log;
+use Carbon\Carbon;
 use Google_Client;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log as FacadesLog;
 
 class FirebaseService
 {
     private PendingRequest $client;
-    private Google_Client $googleClient;
-    private string $googleApiUrl;
-    private array $googleApiTokens;
-
     public function __construct(
-        private Call $call
+        private string $acessToken,
     ) {
-        $this->googleClient = new Google_Client();
-        $this->authWithGoogleApi();
         $this->client = Http::withHeaders($this->getHeaders());
     }
 
-    public function sendPushNotification(string $callRequestId, string $bikerFirebaseToken, string $distance, string $createdAt): void
+    public function sendCallRequestPushNotification(Call $call, CallRequest $callRequest, Biker $biker): void
     {
         try {
-            $response = $this->client->post($this->googleApiUrl, [
+            $response = $this->client->post("https://fcm.googleapis.com/v1/projects/" . env('FIREBASE_APP_ID') . "/messages:send", [
                 'message' => [
-                    'token' => $bikerFirebaseToken,
+                    'token' => $biker->firebase_token,
                     'notification' => [
                         'title' => 'NOVO CHAMADO!',
                         'body' => 'Você recebeu um novo chamado, clique para visualizar.',
                     ],
                     'data' => [
-                        'call_id' => (string)$this->call->id,
-                        'call_request_id' => (string)$callRequestId,
-                        'address' => $this->call->address,
-                        'distance' => str_replace('.', ',', $distance),
-                        'time' => (string) number_format($distance * 4),
+                        'call_id' => (string)$call->id,
+                        'call_request_id' => (string)$callRequest->id,
+                        'address' => $call->address,
+                        'distance' => str_replace('.', ',', number_format($biker->distance / 1000, 1)),
+                        'time' => (string) number_format($biker->distance * 4),
                         'price' => '50,00',
-                        'timeout_response' => (string) $createdAt,
+                        'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(10),
                     ],
                     'android' => [
                         'notification' => [
                             'sound' => 'notification.mp3',
-                            'channel_id' => 'com.example.locavibe_renter_app-5',
+                            'channel_id' => 'com.example.locavibe_renter_app',
                         ],
                     ],
                 ],
             ]);
+
+            if ($response->status() !== 200) {
+                throw new \Exception('Erro ao enviar notificação para o biker.');
+            }
         } catch (\Exception $e) {
-            dd($e);
-        }
-    }
-
-    private function authWithGoogleApi(): void
-    {
-        try {
-            $credentialsFilePath = "firebase/fcm.json";
-            $this->googleClient->setAuthConfig($credentialsFilePath);
-            $this->googleClient->addScope("https://www.googleapis.com/auth/firebase.messaging");
-
-            $this->googleApiUrl = "https://fcm.googleapis.com/v1/projects/" . env('FIREBASE_APP_ID') . "/messages:send";
-
-            $this->googleClient->fetchAccessTokenWithAssertion();
-
-            $this->googleApiTokens = $this->googleClient->getAccessToken();
-        } catch (\Exception $e) {
-            dd($e);
+            FacadesLog::error($e->getMessage());
+            throw $e;
         }
     }
 
     private function getHeaders(): array
     {
         return [
-            'Authorization' => 'Bearer ' . $this->googleApiTokens['access_token'],
+            'Authorization' => 'Bearer ' . $this->acessToken,
             'Content-Type' => 'application/json; UTF-8',
         ];
     }

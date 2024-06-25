@@ -4,13 +4,16 @@ namespace App\Models;
 
 use App\Enums\CallStatus;
 use App\Models\Ileva\IlevaAssociateVehicle;
+use App\Observers\CallObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([CallObserver::class])]
 class Call extends Model
 {
     use HasFactory, HasSpatial;
@@ -24,14 +27,6 @@ class Call extends Model
             'location' => Point::class,
         ];
     }
-
-    // public function getLocationAttribute(): array
-    // {
-    //     return [
-    //         "lat" => (float)$this->location->latitude,
-    //         "lng" => (float)$this->location->longitude,
-    //     ];
-    // }
 
     public static function getLatLngAttributes(): array
     {

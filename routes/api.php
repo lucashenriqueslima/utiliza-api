@@ -5,9 +5,11 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\BikerGeolocationController;
 use App\Http\Controllers\Api\V1\CallRequestController;
 use App\Http\Controllers\Api\V1\FipeModelController;
+use App\Services\Auvo\AuvoService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\BikerController;
+use App\Http\Controllers\Api\V1\CallController;
 use App\Http\Controllers\Api\V1\ExpertiseController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
 
@@ -16,6 +18,9 @@ Route::get('/', function () {
 });
 
 Route::prefix('v1')->group(function () {
+
+    Route::get('/ping', function () {
+    });
 
     Route::prefix('auth')->group(function () {
 
@@ -38,6 +43,7 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [LogoutController::class, 'destroy']);
         Route::get('/fipe/brand/{brandId}/model/{name?}', [FipeModelController::class, 'indexByBrandIdAndName']);
 
+        Route::patch('call/{call}', [CallController::class, 'update']);
         Route::post('call/{call}/expertise/create', [ExpertiseController::class, 'store']);
     });
 });

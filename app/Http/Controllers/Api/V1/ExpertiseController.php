@@ -11,19 +11,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Call;
 use App\Models\Expertise;
 use App\Services\ExpertiseService;
+use App\Services\ThirdParttyService;
+use App\Services\ThirdPartyService;
 use Illuminate\Http\Request;
 
 class ExpertiseController extends Controller
 {
-    private ExpertiseService $service;
-    public function __construct()
-    {
-        $this->service = new ExpertiseService();
-    }
-    public function store(Request $request, Call $call): void
-    {
 
-        // dd($request);
+    public function store(Request $request, Call $call, ExpertiseService $expertiseService): void
+    {
 
         $expertise = $call->expertises()->create(
             [
@@ -33,20 +29,18 @@ class ExpertiseController extends Controller
             ]
         );
 
+        // if ($request->person_type === ExpertiseType::Secondary->value) {
+        //     $expertise->update(['cnpj' => $request->cnpj]);
+        // }
+        if ($request->person_type === ExpertisePersonType::ThirdParty->value) {
+            $expertiseService->handleExpertiseThirdPartyFormTexts($request, $expertise);
+        }
+
         if ($request->type === ExpertiseType::Main->value) {
-            $this->service->handleExpertiseMainFormFiles($request->expertise_files, $expertise);
-            $expertise->formInputs()->create(
-                [
-                    'field_type' => 'report_text',
-                ]
-            );
+            $expertiseService->handleExpertiseMainFormFiles($request, $expertise);
         }
 
         $expertise->update(['status' => ExpertiseStatus::Waiting->value]);
         $call->update(['status' => CallStatus::WaitingValidation->value]);
-        // if ($request->person_type === ExpertisePersonType::Associate) {
-        // } else {
-        //     $call->thirdParty()->create($request->all());
-        // }
     }
 }

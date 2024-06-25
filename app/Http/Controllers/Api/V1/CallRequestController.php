@@ -18,7 +18,7 @@ class CallRequestController extends Controller
 {
     public function accept(Call $call, Biker $biker, CallRequest $callRequest, Request $request)
     {
-        if(in_array($callRequest->status, [CallRequestStatus::NotAnsewered->value, CallRequestStatus::Denied->value]) ) {
+        if (in_array($callRequest->status, [CallRequestStatus::NotAnsewered->value, CallRequestStatus::Denied->value])) {
             return response()->json(['message' => 'Tempo para aceitar o chamado expirado.'], 400);
         }
 

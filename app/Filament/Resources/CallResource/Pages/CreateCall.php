@@ -3,9 +3,11 @@
 namespace App\Filament\Resources\CallResource\Pages;
 
 use App\Filament\Resources\CallResource;
-use App\Jobs\FindBikerForCallJob;
+use App\Jobs\Call\FindBikerForCallJob;
+use App\Jobs\Call\StartLookingForBikerToCallJob;
 use App\Models\Associate;
 use App\Models\Ileva\IlevaAssociate;
+use App\Services\Firebase\FirebaseAuthService;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -34,7 +36,7 @@ class CreateCall extends CreateRecord
 
     protected function afterCreate(): void
     {
-        FindBikerForCallJob::dispatch($this->record);
+        StartLookingForBikerToCallJob::dispatch($this->record);
     }
 
     protected function getRedirectUrl(): string

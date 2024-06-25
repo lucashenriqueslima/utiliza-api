@@ -8,7 +8,9 @@ use App\Enums\S3Prefix;
 use App\Filament\Resources\CallResource;
 use App\Models\Associate;
 use App\Models\AssociateCar;
+use App\Models\Call;
 use App\Models\Expertise;
+use App\Models\ExpertiseFile;
 use App\Models\ExpertiseFormInput;
 use App\Services\S3\S3Service;
 use Filament\Actions\Action;
@@ -27,6 +29,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 class ValidateExpertise extends Page implements HasForms
 {
@@ -38,19 +43,30 @@ class ValidateExpertise extends Page implements HasForms
     protected static ?string $title = 'Validar Perícia';
     public ?array $data = [];
     public ?Collection $expertises;
+
+    public Call $call;
     public AssociateCar $associateCar;
     public Associate $associate;
 
-    public function mount(int|string $record): void
+    public function mount(int|string $callId): void
     {
-        $this->record = $this->resolveRecord($record);
+        $this->record = $this->resolveRecord($callId);
 
+        DB::enableQueryLog();
 
         $this->expertises = $this->record->expertises()
+            ->with([
+                'files' => function ($query) {
+                    $query->whereNull('is_approved');
+                },
+                'thirdParty',
+                'thirdParty.car'
+            ])
             ->where('status', ExpertiseStatus::Waiting)
             ->get();
 
-        if (!$this->expertises) {
+
+        if ($this->expertises->isEmpty()) {
             Notification::make()
                 ->title('Perícia já validada')
                 ->warning()
@@ -68,14 +84,13 @@ class ValidateExpertise extends Page implements HasForms
 
     public function form(Form $form): Form
     {
-
         return $form->schema(
             [
                 $this->getAssociateExpertiseForm(),
                 ...$this->getThirdPartyExpertiseForms(),
             ]
         )
-        ->statePath('data');
+            ->statePath('data');
     }
 
     public function getFormActions(): array
@@ -89,135 +104,123 @@ class ValidateExpertise extends Page implements HasForms
 
     public function save(): void
     {
-        dd($this->data);
+        $data = $this->form->getState();
+
+        $this->expertises
+            ->files
+            ->each(function ($expertiseFile) use ($data) {
+                $expertiseFile->update([
+                    'is_approved' => $data["{$expertiseFile->expertise_id}.{$expertiseFile->id}.is_approved"],
+                    'refusal_description' => $data["{$expertiseFile->expertise_id}.{$expertiseFile->id}.refusal_description"],
+                ]);
+            });
+
+        $this->expertises->update([
+            'status' => ExpertiseStatus::Done
+        ]);
+
+        if ($this->expertises->files->where('is_approved', false)->exists()) {
+        }
     }
 
     public function getAssociateExpertiseForm(): ?Section
     {
-        $associateExpertise = $this->expertises->where('person_type', ExpertisePersonType::Associate->value)
+        $associateExpertise = $this->expertises->where('person_type', ExpertisePersonType::Associate)
             ->first();
 
-        if(!$associateExpertise) {
+        if (!$associateExpertise) {
             return null;
-
         }
         $associateFormFields = array();
 
-        $associateExpertise->files()
-            ->where('is_approved', null)
-            ->get()
-            ->each(function ($associateExpertiseFile) use (&$associateFormFields, $associateExpertise){
+        $associateExpertise->files
+            ->each(function ($associateExpertiseFile) use (&$associateFormFields, $associateExpertise) {
                 $associateFormFields[] = Section::make($associateExpertiseFile->file_expertise_type->getLabel())
-                ->columns(2)
-                ->schema([
-                    ViewField::make("{$associateExpertise->id}_{$associateExpertiseFile->id}_preview")
-                        ->view("filament.resources.call-resource.components.{$associateExpertiseFile->file_expertise_type->getFileType()}-preview", [
-                            'url' => S3Service::getUrl($associateExpertiseFile->path),
-                            'name' => $associateExpertiseFile->file_expertise_type->getLabel(),
-                        ]),
-                    Group::make()->schema([
-                        ToggleButtons::make("{$associateExpertise->id}_{$associateExpertiseFile->id}_is_approved")
-                            ->label('Aprovar?')
-                            ->boolean()
-                            ->grouped()
-                            ->default(false)
-                            ->live()
-                            ->required(),
-                        Textarea::make("{$associateExpertise->id}_{$associateExpertiseFile->id}_refusal_description")
-                            ->label('Motivo da recusa')
-                            ->placeholder('Descreva o motivo da recusa...')
-                            ->disabled(fn (Get $get) => ($get("{$associateExpertise->id}_{$associateExpertiseFile->id}_is_approved")))
-                            ->required(fn (Get $get) => ($get("{$associateExpertise->id}_{$associateExpertiseFile->id}_is_approved") == false))
-                            ->minLength(10)
-                            ->maxLength(50)
-                    ])
-                ]);
+                    ->columns(2)
+                    ->schema([
+                        ViewField::make("{$associateExpertise->id}.{$associateExpertiseFile->id}.preview")
+                            ->view("filament.resources.call-resource.components.{$associateExpertiseFile->file_expertise_type->getFileType()}-preview", [
+                                'url' => S3Service::getUrl($associateExpertiseFile->path),
+                                'name' => $associateExpertiseFile->file_expertise_type->getLabel(),
+                            ]),
+                        Group::make()->schema([
+                            ToggleButtons::make("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved")
+                                ->label('Aprovar?')
+                                ->boolean()
+                                ->grouped()
+                                ->default(false)
+                                ->live()
+                                ->required(),
+                            Textarea::make("{$associateExpertise->id}.{$associateExpertiseFile->id}.refusal_description")
+                                ->label('Motivo da recusa')
+                                ->placeholder('Descreva o motivo da recusa...')
+                                ->disabled(fn (Get $get) => ($get("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved")))
+                                ->required(fn (Get $get) => ($get("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved") == false))
+                                ->minLength(10)
+                                ->maxLength(50)
+                        ])
+                    ]);
             });
 
-            return Section::make($this->associate->name . ' - ' . $this->associateCar->plate)
+        return Section::make($this->associate->name . ' - ' . $this->associateCar->plate)
             ->description('Associado')
             ->columns(2)
+            ->collapsed()
             ->schema([
                 ...$associateFormFields
             ]);
-
     }
 
     public function getThirdPartyExpertiseForms(): ?array
     {
-        $thirdPartyExpertises = $this->expertises->where('person_type', ExpertisePersonType::ThirdParty->value);
-
-        if(empty($thirdPartyExpertises)) {
+        $thirdPartyExpertises = $this->expertises->where('person_type', ExpertisePersonType::ThirdParty);
+        if ($thirdPartyExpertises->isEmpty()) {
             return null;
         }
 
         $thirdPartyExpertiseForms = array();
 
-        $thirdPartyExpertises->each(function ($thirdPartyExpertise) use (&$thirdPartyExpertiseForms){
-            $thirdPartyExpertiseForms[] = Section::make($thirdPartyExpertise->name)
-            ->description('Terceiro')
-            ->columns(2)
-            ->schema([
-            $thirdPartyExpertise->formInputs()
-                ->get()
-                ->map(function ($thirdPartyFormInput) use ($thirdPartyExpertise){
-                    return
-                    [
-                        TextInput::make("{$thirdPartyExpertise->id}_{$thirdPartyFormInput->id}_{$thirdPartyFormInput->field_type->value}_preview")
-                            ->label($thirdPartyFormInput->field_type->getLabel())
-                            ->readOnly(),
-                        Group::make()->schema([
-                            ToggleButtons::make("{$thirdPartyExpertise->id}_{$thirdPartyFormInput->id}_{$thirdPartyFormInput->field_type->value}_is_approved")
-                                ->label('Aprovar?')
-                                ->boolean()
-                                ->grouped()
-                                ->default(false)
-                                ->live()
-                                ->required(),
-                            Textarea::make("{$thirdPartyExpertise->id}_{$thirdPartyFormInput->id}_{$thirdPartyFormInput->field_type->value}_refusal_description")
-                                ->label('Motivo da recusa')
-                                ->placeholder('Descreva o motivo da recusa...')
-                                ->disabled(fn (Get $get) => ($get("{$thirdPartyExpertise->id}_{$thirdPartyFormInput->id}_{$thirdPartyFormInput->field_type->value}_is_approved")))
-                                ->required(fn (Get $get) => ($get("{$thirdPartyExpertise->id}_{$thirdPartyFormInput->id}_{$thirdPartyFormInput->field_type->value}_is_approved") == false))
-                                ->minLength(10)
-                                ->maxLength(50)
-                            ])
-                    ];
-                }),
-            $thirdPartyExpertise->files()
-                ->get()
-                ->map(function ($thirdPartyFile) use ($thirdPartyExpertise){
-                    return
-                    [
-                        ViewField::make("{$thirdPartyExpertise->id}_{$thirdPartyFile->id}_{$thirdPartyFile->file_expertise_type->value}_preview")
-                            ->view("filament.resources.call-resource.components.{$thirdPartyFile->file_expertise_type->getFileType()}-preview", [
-                                'url' => S3Service::getUrl($thirdPartyFile->path),
-                                'name' => $thirdPartyFile->file_expertise_type->getLabel(),
-                            ]),
-                        Group::make()->schema([
-                            ToggleButtons::make("{$thirdPartyExpertise->id}_{$thirdPartyFile->id}_{$thirdPartyFile->file_expertise_type->value}_is_approved")
-                                ->label('Aprovar?')
-                                ->boolean()
-                                ->grouped()
-                                ->default(false)
-                                ->live()
-                                ->required(),
-                            Textarea::make("{$thirdPartyExpertise->id}_{$thirdPartyFile->id}_{$thirdPartyFile->file_expertise_type->value}_refusal_description")
-                                ->label('Motivo da recusa')
-                                ->placeholder('Descreva o motivo da recusa...')
-                                ->disabled(fn (Get $get) => ($get("{$thirdPartyExpertise->id}_{$thirdPartyFile->id}_{$thirdPartyFile->file_expertise_type->value}_is_approved")))
-                                ->required(fn (Get $get) => ($get("{$thirdPartyExpertise->id}_{$thirdPartyFile->id}_{$thirdPartyFile->file_expertise_type->value}_is_approved") == false))
-                                ->minLength(10)
-                                ->maxLength(50)
-                        ])
-                    ];
-                })
+        $thirdPartyExpertises->each(function ($thirdPartyExpertise) use (&$thirdPartyExpertiseForms) {
+            $thirdPartyExpertiseForms[] = Section::make(
+                $thirdPartyExpertise->thirdParty->name . ' - ' . Str::remove('-', $thirdPartyExpertise->thirdParty->car->plate)
+            )
+                ->description('Terceiro')
+                ->columns(2)
+                ->collapsed()
+                ->schema([
+                    ...$thirdPartyExpertise->files
+                        ->map(function ($thirdPartyFile) use ($thirdPartyExpertise) {
+                            return
+                                Section::make($thirdPartyFile->file_expertise_type->getLabel())
+                                ->columns(2)
+                                ->schema([
+                                    ViewField::make("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.{$thirdPartyFile->file_expertise_type->value}_preview")
+                                        ->view("filament.resources.call-resource.components.{$thirdPartyFile->file_expertise_type->getFileType()}-preview", [
+                                            'url' => S3Service::getUrl($thirdPartyFile->path),
+                                            'name' => $thirdPartyFile->file_expertise_type->getLabel(),
+                                        ]),
+                                    Group::make()->schema([
+                                        ToggleButtons::make("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.{$thirdPartyFile->file_expertise_type->value}_is_approved")
+                                            ->label('Aprovar?')
+                                            ->boolean()
+                                            ->grouped()
+                                            ->default(false)
+                                            ->live()
+                                            ->required(),
+                                        Textarea::make("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.{$thirdPartyFile->file_expertise_type->value}_refusal_description")
+                                            ->label('Motivo da recusa')
+                                            ->placeholder('Descreva o motivo da recusa...')
+                                            ->disabled(fn (Get $get) => ($get("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.{$thirdPartyFile->file_expertise_type->value}_is_approved")))
+                                            ->required(fn (Get $get) => ($get("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.{$thirdPartyFile->file_expertise_type->value}_is_approved") == false))
+                                            ->minLength(10)
+                                            ->maxLength(50)
+                                    ])
+                                ]);
+                        })
 
-            ]);
+                ]);
         });
 
         return $thirdPartyExpertiseForms;
-
     }
-
 }

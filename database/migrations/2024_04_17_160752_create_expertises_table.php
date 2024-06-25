@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('expertises', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->foreignId('call_id')->constrained('calls');
             $table->integer('app_expertise_index');
-            $table->enum('type', ['main', 'final']);
-            $table->enum('person_type', ['associate', 'third_party']);
+            $table->enum('type', ['main', 'secondary']);
+            $table->enum('person_type', ['associate', 'third_party', 'eyewitness']);
             $table->enum('status', ['canceled', 'done', 'waiting'])->nullable();
             $table->timestamps();
         });

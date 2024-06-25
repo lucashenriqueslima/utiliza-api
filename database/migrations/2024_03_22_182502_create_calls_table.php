@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('address');
             $table->geometry('location', subtype: 'point')->nullable();
             $table->longText('observation')->nullable();
-            $table->enum('status', ['searching_biker', 'waiting_arrival', 'in_service', 'waiting_validation', 'approved'])->default('searching_biker');
+            $table->enum('status', ['searching_biker', 'waiting_arrival', 'in_service', 'waiting_validation', 'in_validation', 'waiting_biker_see_validation', 'approved'])->default('searching_biker');
             $table->timestamp('biker_accepted_at')->nullable();
             $table->timestamps();
         });

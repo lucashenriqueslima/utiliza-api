@@ -17,5 +17,4 @@ class ThirdParty extends Model
     {
         return $this->hasOne(ThirdPartyCar::class);
     }
-
 }

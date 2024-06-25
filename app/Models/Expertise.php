@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ExpertisePersonType;
 use App\Enums\ExpertiseStatus;
 use App\Enums\ExpertiseType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,7 @@ class Expertise extends Model
         return [
             'status' => ExpertiseStatus::class,
             'type' => ExpertiseType::class,
+            'person_type' => ExpertisePersonType::class,
         ];
     }
 
@@ -37,13 +39,19 @@ class Expertise extends Model
         return $this->hasMany(ExpertiseFile::class);
     }
 
-    public function formInputs(): HasMany
+
+    public function parent()
     {
-        return $this->hasMany(ExpertiseFormInput::class);
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
-    public function thirdParty(): HasMany
+    public function children()
     {
-        return $this->hasMany(ThirdParty::class);
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function thirdParty(): HasOne
+    {
+        return $this->hasOne(ThirdParty::class);
     }
 }

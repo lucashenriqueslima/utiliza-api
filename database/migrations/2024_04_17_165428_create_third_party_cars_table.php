@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('third_party_cars', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('ileva_fipe_brand_id');
-            $table->enum('vehicle_type', ['carro', 'moto', 'caminhao', 'outros']);
-            $table->string('fipe_code');
+            $table->foreignId('third_party_id')->constrained('third_parties');
+            $table->string('plate');
             $table->timestamps();
         });
     }
@@ -25,6 +24,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('third_party_cars', function (Blueprint $table) {
+            $table->dropForeign(['third_party_id']);
+        });
         Schema::dropIfExists('third_party_cars');
     }
 };

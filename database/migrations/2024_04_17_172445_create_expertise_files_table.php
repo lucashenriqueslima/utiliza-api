@@ -14,17 +14,24 @@ return new class extends Migration
         Schema::create('expertise_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('expertise_id')->constrained('expertises');
-            $table->string('path');
+            $table->string('path')->nullable();
             $table->enum('file_expertise_type', [
                 'report_audio',
                 'report_video',
+                'cnh_front_image',
+                'crlv_front_image',
                 'vehicle_plate_image',
                 'vehicle_front_side_image',
                 'vehicle_right_side_image',
                 'vehicle_left_side_image',
                 'vehicle_rear_side_image',
                 'vehicle_street_video',
+                'road_image',
+                'road_sign_image',
+                'biker_observation_audio',
+                'dynamic_image',
             ]);
+            $table->longText('error_message')->nullable();
             $table->boolean('is_approved')->nullable();
             $table->string('refusal_description')->nullable();
             $table->timestamps();
