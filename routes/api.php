@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\BikerController;
 use App\Http\Controllers\Api\V1\CallController;
 use App\Http\Controllers\Api\V1\ExpertiseController;
+use App\Http\Controllers\Api\V1\ExpertiseFileValidationErrorController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
 
 Route::get('/', function () {
@@ -43,7 +44,10 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [LogoutController::class, 'destroy']);
         Route::get('/fipe/brand/{brandId}/model/{name?}', [FipeModelController::class, 'indexByBrandIdAndName']);
 
+        Route::get('call/{id}/status', [CallController::class, 'showStatus']);
         Route::patch('call/{call}', [CallController::class, 'update']);
         Route::post('call/{call}/expertise/create', [ExpertiseController::class, 'store']);
+
+        Route::get('/call/{call}/expertise/file-validation-errors', [ExpertiseFileValidationErrorController::class, 'index']);
     });
 });

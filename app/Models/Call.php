@@ -72,4 +72,9 @@ class Call extends Model
     {
         return $this->hasMany(CallRequest::class);
     }
+
+    public function validationErrors(): HasMany
+    {
+        return $this->hasMany(ExpertiseFileValidationError::class);
+    }
 }

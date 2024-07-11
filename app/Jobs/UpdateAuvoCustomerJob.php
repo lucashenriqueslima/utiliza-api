@@ -41,7 +41,6 @@ class UpdateAuvoCustomerJob implements ShouldQueue
 
         try {
 
-            Log::info($this->prefixExternalId);
             $response = $client->put(
                 'customers',
                 [

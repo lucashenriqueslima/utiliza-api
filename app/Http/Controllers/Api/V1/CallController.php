@@ -13,4 +13,14 @@ class CallController extends Controller
     {
         $call->update(['status' => $request->status]);
     }
+
+    public function showStatus(string $id)
+    {
+        return
+            response()->json([
+                'status' => Call::select('status')
+                    ->find($id)
+                    ->status,
+            ]);
+    }
 }

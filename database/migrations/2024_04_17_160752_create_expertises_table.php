@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('app_expertise_index');
             $table->enum('type', ['main', 'secondary']);
             $table->enum('person_type', ['associate', 'third_party', 'eyewitness']);
-            $table->enum('status', ['canceled', 'done', 'waiting'])->nullable();
+            $table->enum('status', ['canceled', 'done', 'waiting', 'waiting_validate_from_others'])->nullable();
             $table->timestamps();
         });
     }

@@ -311,7 +311,7 @@ class CallResource extends Resource
                         $distance = number_format($rawDistance[0]->distance / 1000, 1);
 
 
-                        return str_replace('.', ',', number_format($distance * 4) . " min ($distance km)");
+                        return str_replace('.', ',', number_format($distance * 3.5) . " min ( " . $distance * 1.5 . " km)");
                     }),
                 TextColumn::make('created_at')
                     ->label('Data de Criação')
@@ -336,10 +336,12 @@ class CallResource extends Resource
                         'searching_biker' => 'Buscando Motoboy',
                         'waiting_arrival' => 'Aguardando Chegada',
                         'in_service' => 'Em Serviço',
+                        'in_validation' => 'Em Validação',
+                        'waiting_biker_see_validation' => 'Aguardando Motoboy Ver Validação',
                         'waiting_validation' => 'Aguardando Aprovação',
                         'approved' => 'Aprovado',
                     ])
-                    ->default(['searching_biker', 'waiting_arrival', 'waiting_validation', 'in_service'])
+                    ->default(['searching_biker', 'waiting_arrival', 'waiting_validation', 'in_service', 'in_validation', 'waiting_biker_see_validation'])
             ])
             ->actions([
                 Action::make('validate_expertise')
@@ -348,7 +350,7 @@ class CallResource extends Resource
                     ->icon('heroicon-o-eye')
                     ->color('danger')
                     ->url(fn (Call $record): string => self::getUrl('validate', ['callId' => $record]))
-                    ->hidden(fn (Call $call): bool => $call->status != CallStatus::WaitingValidation)
+                    ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation]))
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

@@ -16,6 +16,10 @@ class Biker extends Authenticatable
     protected $guarded = [];
 
 
+    public function call(): HasMany
+    {
+        return $this->hasMany(Call::class);
+    }
 
     public function callRequests(): HasMany
     {
@@ -31,6 +35,4 @@ class Biker extends Authenticatable
     {
         return $this->hasOne(Motorcycle::class);
     }
-
-
 }

@@ -7,6 +7,7 @@ use App\Enums\BikerStatus;
 use App\Enums\CallRequestStatus;
 use App\Enums\CallStatus;
 use App\Jobs\CallRequest\SendCallRequestPushNotification;
+use App\Jobs\CallRequest\SendCallRequestPushNotificationJob;
 use App\Models\Biker;
 use App\Models\Call;
 use App\Models\CallRequest;
@@ -40,10 +41,11 @@ class StartLookingForBikerToCallJob implements ShouldQueue
     public function handle(): void
     {
 
+
+
         $this->bikers = Biker::selectRaw(
             '
         bikers.id,
-        firebase_token,
         ST_Distance_Sphere(POINT(?, ?), biker_geolocations.location) AS distance',
             [
                 $this->call->location->longitude,
@@ -55,9 +57,11 @@ class StartLookingForBikerToCallJob implements ShouldQueue
             ->orderBy('distance')
             ->get();
 
-        SendCallRequestPushNotification::dispatch(
+
+        SendCallRequestPushNotificationJob::dispatch(
             $this->call,
             $this->bikers,
+            $this->bikers->pluck('distance')->toArray(),
             (new FirebaseAuthService())->getAccessToken()
 
         );

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\BikerStatus;
 use App\Enums\CallRequestStatus;
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AssociateResource;
 use App\Http\Resources\CallResource;
@@ -36,6 +37,10 @@ class CallRequestController extends Controller
         $biker->update([
             'status' => BikerStatus::Busy->value
         ]);
+
+        $call->with(['expertises' => function ($query) {
+            $query->where('type', ExpertiseType::Secondary);
+        }])->get();
 
         return response()->json(new CallResource($call), 200);
     }

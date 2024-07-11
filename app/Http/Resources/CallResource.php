@@ -20,7 +20,10 @@ class CallResource extends JsonResource
             'latitude' => $this->location->latitude,
             'longitude' => $this->location->longitude,
             'accepted_at' => $this->biker_accepted_at,
-            'status' => $this->status->value,	
+            'status' => $this->status->value,
+            'observation' => $this->observation,
+            'main_expertise_status' => $this->status->value,
+            'secondary_expertise_status' => 'waiting_main_expertise',
             'associate_car' => new AssociateCarResource($this->associateCar),
         ];
     }

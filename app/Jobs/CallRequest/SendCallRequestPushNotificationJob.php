@@ -2,7 +2,7 @@
 
 namespace App\Jobs\CallRequest;
 
-use App\Jobs\Call\HandleCallContinuityAfterCallRequest;
+use App\Jobs\Call\HandleCallContinuityAfterCallRequestJob;
 use App\Models\Biker;
 use App\Models\CallRequest;
 use App\Models\Call;
@@ -17,20 +17,19 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class SendCallRequestPushNotification implements ShouldQueue
+class SendCallRequestPushNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected CallRequest $callRequest;
-    protected Biker $biker;
 
     public function __construct(
         protected Call $call,
         protected Collection $bikers,
+        protected array $distances,
         protected string $firebaseAccessToken,
 
     ) {
-        $this->biker = $this->bikers->first();
     }
 
     /**
@@ -38,44 +37,46 @@ class SendCallRequestPushNotification implements ShouldQueue
      */
     public function handle(): void
     {
-
         $firebaseService = new FirebaseService((new FirebaseAuthService())->getAccessToken());
+
+        $biker = $this->bikers->shift();
+        $this->distances;
 
         $this->callRequest = CallRequest::create([
             'call_id' => $this->call->id,
-            'biker_id' => $this->biker->id,
+            'biker_id' => $biker->id,
         ]);
 
         try {
             $firebaseService->sendCallRequestPushNotification(
                 $this->call,
                 $this->callRequest,
-                $this->biker,
+                $biker,
+                array_shift($this->distances) / 1000,
             );
 
-            $this->bikers->shift();
-
-            HandleCallContinuityAfterCallRequest::dispatch(
+            HandleCallContinuityAfterCallRequestJob::dispatch(
                 $this->call,
                 $this->callRequest,
                 $this->bikers,
                 $this->firebaseAccessToken,
+                $this->distances,
             )->delay(now()->addSeconds(12));
         } catch (\Exception $e) {
-            $this->bikers->shift();
 
-            HandleCallContinuityAfterCallRequest::dispatch(
+            HandleCallContinuityAfterCallRequestJob::dispatch(
                 $this->call,
                 $this->callRequest,
                 $this->bikers,
                 $this->firebaseAccessToken,
+                $this->distances,
             )->delay(now()->addSeconds(12));
             Log::error($e->getMessage());
         }
 
         // $this->bikers = array_shift($this->bikers);
 
-        // dispatch(new HandleCallContinuityAfterCallRequest(
+        // dispatch(new HandleCallContinuityAfterCallRequestJob(
         //     $this->callId,
         //     $this->callRequest->id,
         //     $this->bikers,

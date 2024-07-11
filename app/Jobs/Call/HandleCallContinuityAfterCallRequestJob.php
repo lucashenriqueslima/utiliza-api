@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Call;
 
-use App\Jobs\CallRequest\SendCallRequestPushNotification;
+use App\Jobs\CallRequest\SendCallRequestPushNotificationJob;
 use App\Models\Call;
 use App\Models\CallRequest;
 use App\Services\CallRequestService;
@@ -15,7 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Laravel\Octane\Facades\Octane;
 
-class HandleCallContinuityAfterCallRequest implements ShouldQueue
+class HandleCallContinuityAfterCallRequestJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -24,6 +24,7 @@ class HandleCallContinuityAfterCallRequest implements ShouldQueue
         protected CallRequest $callRequest,
         protected Collection $bikers,
         protected string $firebaseAccessToken,
+        protected array $distances,
     ) {
     }
 
@@ -50,6 +51,11 @@ class HandleCallContinuityAfterCallRequest implements ShouldQueue
             return;
         }
 
-        SendCallRequestPushNotification::dispatch($this->call, $this->bikers, $this->firebaseAccessToken);
+        SendCallRequestPushNotificationJob::dispatch(
+            $this->call,
+            $this->bikers,
+            $this->distances,
+            $this->firebaseAccessToken,
+        );
     }
 }

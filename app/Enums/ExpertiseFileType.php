@@ -1,17 +1,5 @@
 <?php
 
-// 'report_audio',
-// 'report_video',
-// 'cnh_front_image',
-// 'crlv_front_image',
-// 'vehicle_plate_image',
-// 'vehicle_front_side_image',
-// 'vehicle_right_side_image',
-// 'vehicle_left_side_image',
-// 'vehicle_rear_side_image',
-// 'vehicle_street_video',
-// 'dynamic_image',
-
 namespace App\Enums;
 
 enum ExpertiseFileType: string

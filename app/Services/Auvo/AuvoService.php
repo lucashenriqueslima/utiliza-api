@@ -28,14 +28,14 @@ class AuvoService
         return Octane::concurrently([
             function () {
                 try {
-                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvo('ileva_motoclub');
+                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvoToSolidy('ileva_motoclub');
                 } catch (\Exception $e) {
                     return $e->getMessage();
                 }
             },
             function () {
                 try {
-                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvo('ileva');
+                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvoToMotoclub('ileva');
                 } catch (\Exception $e) {
                     return $e->getMessage();
                 }

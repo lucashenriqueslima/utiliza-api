@@ -40,7 +40,7 @@ class ExpertiseController extends Controller
             $expertiseService->handleExpertiseMainFormFiles($request, $expertise);
         }
 
-        $expertise->update(['status' => ExpertiseStatus::Waiting->value]);
-        $call->update(['status' => CallStatus::WaitingValidation->value]);
+        $expertise->update(['status' => ExpertiseStatus::Waiting]);
+        $call->update(['status' => CallStatus::WaitingValidation]);
     }
 }
