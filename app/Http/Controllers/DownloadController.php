@@ -2,22 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Aws\S3\S3Client;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class DownloadController extends Controller
 {
     public function download()
     {
-        $s3Client = new S3Client([
-            'region'  => env('AWS_DEFAULT_REGION'),
-            'version' => 'latest',
-            'credentials' => [
-                'key'    => env('AWS_ACCESS_KEY_ID'),
-                'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            ],
-        ]);
-
         $files = [
             'public/expertise/3xLTLV3PgP6MCcSm0YENOJGxZqqIwi3sDtdrbzUL.jpg' => 'image1.jpg',
             'public/expertise/0TUchqJTsgUGn7PuANDx5qFYcPpqWwApZga4oEOJ.jpg' => 'image2.jpg',
@@ -30,11 +21,8 @@ class DownloadController extends Controller
 
         try {
             foreach ($files as $s3Key => $localFilename) {
-                $s3Client->getObject([
-                    'Bucket' => env('AWS_BUCKET'),
-                    'Key'    => $s3Key,
-                    'SaveAs' => $tempDir . '/' . $localFilename,
-                ]);
+                $fileContents = Storage::get($s3Key);
+                file_put_contents($tempDir . '/' . $localFilename, $fileContents);
             }
 
             $zipFile = $this->createZipArchive($files, $tempDir);
