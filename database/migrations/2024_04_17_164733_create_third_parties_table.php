@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('third_parties', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('call_id')->constrained('calls');
             $table->foreignId('expertise_id')->constrained('expertises');
             $table->string('name');
             $table->string('cpf');

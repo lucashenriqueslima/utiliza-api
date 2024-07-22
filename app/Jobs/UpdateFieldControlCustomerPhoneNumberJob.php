@@ -9,9 +9,8 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
-class UpdateFieldControlCustomerJob implements ShouldQueue
+class UpdateFieldControlCustomerPhoneNumberJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -26,6 +25,7 @@ class UpdateFieldControlCustomerJob implements ShouldQueue
     /**
      * Execute the job.
      */
+
     public function handle(PendingRequest $client): void
     {
 
@@ -35,6 +35,9 @@ class UpdateFieldControlCustomerJob implements ShouldQueue
         ]);
 
         try {
+
+            $customerId = '';
+
             $response = $client->get('https://carchost.fieldcontrol.com.br/customers?q=code:"' . $this->customer->code . '"');
 
 
@@ -46,8 +49,9 @@ class UpdateFieldControlCustomerJob implements ShouldQueue
 
             foreach ($items as $item) {
                 if ($item['code'] == $this->customer->code && $item['archived'] == false) {
+                    $customerId = $item['id'];
                     // Log::info("Customer {$this->customer->name} already exists in Field Control");
-                    return;
+                    continue;
                 }
             }
 
@@ -55,28 +59,11 @@ class UpdateFieldControlCustomerJob implements ShouldQueue
 
             try {
                 $response = $client->post(
-                    "https://carchost.fieldcontrol.com.br/customers",
+                    "https://carchost.fieldcontrol.com.br/customers/{$customerId}/phones",
                     [
-                        'name' => $this->customer->name,
-                        'documentNumber' => $this->customer->cpf,
-                        'code' => $this->customer->code,
-                        'external' => [
-                            'id' => $this->customer->code
-                        ],
-                        'address' => [
-                            'zipCode' => Str::remove('-', $this->customer->cep,),
-                            'street' => $this->customer->logradouro ?? 'S/ Logradouro',
-                            'number' => $this->customer->numero ?? 'S/N',
-                            'neighborhood' => $this->customer->bairro ?? 'S/ Bairro',
-                            'complement' => $this->customer->complemento ?? 'S/ Complemento',
-                            'city' => $this->customer->cidade ?? 'S/ Cidade',
-                            'state' => $this->customer->uf ?? 'S/ UF',
-                            'coords' => [
-                                "latitude" => -23.558418,
-                                "longitude" => -46.688081
-                            ]
-                        ]
-
+                        'number' => $this->customer->phone_number,
+                        'type' => 'mobile',
+                        'primary' => true,
                     ]
                 );
 

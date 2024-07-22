@@ -26,21 +26,23 @@ class ExpertiseController extends Controller
                 'type' => $request->type,
                 'person_type' => $request->person_type,
                 'app_expertise_index' => $request->index,
+                'main_expertise_group' => $request->main_expertise_group,
             ]
         );
 
-        // if ($request->person_type === ExpertiseType::Secondary->value) {
-        //     $expertise->update(['cnpj' => $request->cnpj]);
-        // }
         if ($request->person_type === ExpertisePersonType::ThirdParty->value) {
-            $expertiseService->handleExpertiseThirdPartyFormTexts($request, $expertise);
+            $expertiseService->handleExpertiseThirdPartyFormTexts($request, $expertise, $call->id);
         }
 
         if ($request->type === ExpertiseType::Main->value) {
             $expertiseService->handleExpertiseMainFormFiles($request, $expertise);
+        } else {
+            $expertiseService->handleExpertiseSecondaryFormFiles($request, $expertise);
+            $expertise->update(['status' => ExpertiseStatus::Done]);
         }
 
-        $expertise->update(['status' => ExpertiseStatus::Waiting]);
-        $call->update(['status' => CallStatus::WaitingValidation]);
+        // if ($request->person_type != ExpertiseType::Secondary->value) {
+        //     $call->update(['status' => CallStatus::WaitingValidation]);
+        // }
     }
 }

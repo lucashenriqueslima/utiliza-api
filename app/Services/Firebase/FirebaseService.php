@@ -34,6 +34,12 @@ class FirebaseService
                         'title' => 'NOVO CHAMADO!',
                         'body' => 'Você recebeu um novo chamado, clique para visualizar.',
                     ],
+                    'android' => [
+                        'notification' => [
+                            'sound' => 'notification.mp3',
+                            'channel_id' => 'com.example.locavibe_renter_app',
+                        ],
+                    ],
                     'data' => [
                         'path' => '/dashboard',
                         'call_id' => (string)$call->id,
@@ -44,16 +50,11 @@ class FirebaseService
                         'price' => '50,00',
                         'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(10),
                     ],
-                    'android' => [
-                        'notification' => [
-                            'sound' => 'notification.mp3',
-                        ],
-                    ],
                 ],
             ]);
 
             if ($response->status() !== 200) {
-                throw new \Exception('Erro ao enviar notificação para o biker.');
+                FacadesLog::error($response->body());
             }
         } catch (\Exception $e) {
             FacadesLog::error($e->getMessage());

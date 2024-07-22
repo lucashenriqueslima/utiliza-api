@@ -57,6 +57,9 @@ class StartLookingForBikerToCallJob implements ShouldQueue
             ->orderBy('distance')
             ->get();
 
+        if ($this->bikers->isEmpty()) {
+            StartLookingForBikerToCallJob::dispatch($this->call)->delay(now()->addMinutes(2));
+        }
 
         SendCallRequestPushNotificationJob::dispatch(
             $this->call,

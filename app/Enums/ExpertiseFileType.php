@@ -16,8 +16,13 @@ enum ExpertiseFileType: string
     case RoadImage = 'road_image';
     case RoadSignImage = 'road_sign_image';
     case BikerObservationAudio = 'biker_observation_audio';
-
     case DynamicImage = 'dynamic_image';
+    case Video360 = 'video_360';
+    case ComercialFacade = 'commercial_facade';
+    case WitnessAudioReport = 'witness_audio_report';
+    case WitnessVideoReport = 'witness_video_report';
+
+
 
     public function getLabel(): string
     {
@@ -34,7 +39,11 @@ enum ExpertiseFileType: string
             self::RoadImage => 'Imagem da Via',
             self::RoadSignImage => 'Imagem de Sinalização',
             self::BikerObservationAudio => 'Observação do Motociclista',
-            self::DynamicImage => 'Imagem Complementar'
+            self::DynamicImage => 'Imagem Complementar',
+            self::Video360 => 'Vídeo 360',
+            self::ComercialFacade => 'Fachada Comercial',
+            self::WitnessAudioReport => 'Relato de Testemunha em Áudio',
+            self::WitnessVideoReport => 'Relato de Testemunha em Vídeo',
         };
     }
 
@@ -54,6 +63,10 @@ enum ExpertiseFileType: string
             self::RoadSignImage => 'image',
             self::BikerObservationAudio => 'audio',
             self::DynamicImage => 'image',
+            self::Video360 => 'video',
+            self::ComercialFacade => 'image',
+            self::WitnessAudioReport => 'audio',
+            self::WitnessVideoReport => 'video',
         };
     }
 }

@@ -13,8 +13,20 @@ class ThirdParty extends Model
 
     protected $guarded = [];
 
+
+
+    public function call(): HasOne
+    {
+        return $this->hasOne(Call::class);
+    }
+
     public function car(): HasOne
     {
         return $this->hasOne(ThirdPartyCar::class);
+    }
+
+    public function expertise(): HasOne
+    {
+        return $this->hasOne(Expertise::class);
     }
 }

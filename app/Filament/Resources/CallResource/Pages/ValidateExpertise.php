@@ -123,16 +123,17 @@ class ValidateExpertise extends Page implements HasForms
         if (!$associateExpertise) {
             return Hidden::make('');
         }
-        $associateFormFields = array();
+        $associateFormFields = [];
 
         $associateExpertise->files
             ->where('file_expertise_type', '!=', ExpertiseFileType::DynamicImage)
+            ->whereNull('is_approved')
             ->each(function ($associateExpertiseFile) use (&$associateFormFields, $associateExpertise) {
                 if ($associateExpertiseFile->file_expertise_type == ExpertiseFileType::DynamicImage) {
                     return;
                 }
 
-                $associateFormFields[] = Section::make($associateExpertiseFile->file_expertise_type->getLabel())
+                $associateFormFields[] = Section::make("Associado | {$associateExpertiseFile->file_expertise_type->getLabel()}")
                     ->columns(2)
                     ->schema([
                         ViewField::make("{$associateExpertise->id}.{$associateExpertiseFile->id}.preview")
@@ -174,7 +175,7 @@ class ValidateExpertise extends Page implements HasForms
             return [];
         }
 
-        $thirdPartyExpertiseForms = array();
+        $thirdPartyExpertiseForms = [];
 
         $thirdPartyExpertises->each(function ($thirdPartyExpertise) use (&$thirdPartyExpertiseForms) {
             $thirdPartyExpertiseForms[] = Section::make(
@@ -189,7 +190,7 @@ class ValidateExpertise extends Page implements HasForms
                         ->where('file_expertise_type', '!=', ExpertiseFileType::DynamicImage)
                         ->map(function ($thirdPartyFile) use ($thirdPartyExpertise) {
                             return
-                                Section::make($thirdPartyFile->file_expertise_type->getLabel())
+                                Section::make('Terceiro ' . Str::upper($thirdPartyExpertise->thirdParty->name . ' - ' . Str::remove('-', $thirdPartyExpertise->thirdParty->car->plate)) . " | {$thirdPartyFile->file_expertise_type->getLabel()}")
                                 ->columns(2)
                                 ->schema([
                                     ViewField::make("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.{$thirdPartyFile->file_expertise_type->value}_preview")
@@ -266,7 +267,11 @@ class ValidateExpertise extends Page implements HasForms
             ->each(function ($expertise) use ($data) {
                 $expertise->files
                     ->where('file_expertise_type', '!=', ExpertiseFileType::DynamicImage)
+                    ->whereNull('is_approved')
                     ->each(function ($file) use ($data, $expertise) {
+                        if (!isset($data[$expertise->id][$file->id])) {
+                            return;
+                        }
                         $isApproved = $data[$expertise->id][$file->id]['is_approved'];
                         $refusalDescription = $data[$expertise->id][$file->id]['refusal_description'] ?? null;
 

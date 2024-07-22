@@ -43,16 +43,17 @@ class IlevaAssociateVehicle extends Model
         return DB::connection('ileva')
             ->select("
             SELECT
-            CONCAT(hav.id, ' / ', hap.nome, ' / ', hav.placa, ' / ', IF(habv.id_beneficio IN (118,122,130,174,234), 'PROTECT', 'LOCALIZO')) name,
+            CONCAT(hav.id, ' / ', hap.nome, ' / ', hav.placa, ' / ', IF(habv.id_beneficio IN (118,122,130,174,234), 'PROTECT', 'LOCALIZO'), ' / ', DATE_FORMAT(habv.created_at, '%d/%m/%Y')) name,
             hap.cpf,
-            hav.id code,
+            CAST(hav.id AS CHAR) code,
             hap.logradouro,
             hap.numero,
             hap.bairro,
             hap.complemento,
             hap.cep,
             hmuc.cidade,
-            hmus.uf
+            hmus.uf,
+            IFNULL(hap.tel_celular, '00000000000') phone_number
             FROM
             hbrd_asc_veiculo hav
             INNER JOIN hbrd_asc_beneficio_veiculo habv on hav.id = habv.id_veiculo

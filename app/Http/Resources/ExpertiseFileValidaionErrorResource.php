@@ -16,7 +16,8 @@ class ExpertiseFileValidaionErrorResource extends JsonResource
     {
 
         return [
-            'app_index' => $this->expertiseFile->expertise->app_expertise_index,
+            'app_index' => (string)$this->expertiseFile->expertise->app_expertise_index,
+            'person_type' => $this->expertiseFile->expertise->person_type,
             'file_type' => $this->expertiseFile->file_expertise_type,
             'error_message' => $this->error_message,
         ];

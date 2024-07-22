@@ -30,6 +30,10 @@ return new class extends Migration
                 'road_sign_image',
                 'biker_observation_audio',
                 'dynamic_image',
+                'video_360',
+                'witness_audio_report',
+                'witness_video_report',
+                'commercial_facade',
             ]);
             $table->longText('error_message')->nullable();
             $table->boolean('is_approved')->nullable();

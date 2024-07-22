@@ -146,7 +146,7 @@ class CallResource extends Resource
                                 ->where('hbrd_asc_pessoa.nome', 'like', "%" . $search . "%")
                                 ->limit(50)
                                 ->get()
-                                ->mapWithKeys(fn ($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? 'Regularizado')])
+                                ->mapWithKeys(fn ($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? '0') . ' dia(s) de atraso'])
                                 ->toArray()
                         )
                         ->getOptionLabelUsing(fn ($value) => IlevaAssociate::find($value)->person->nome ?? $value),
@@ -308,6 +308,7 @@ class CallResource extends Resource
                             ]
                         );
 
+
                         $distance = number_format($rawDistance[0]->distance / 1000, 1);
 
 
@@ -350,7 +351,13 @@ class CallResource extends Resource
                     ->icon('heroicon-o-eye')
                     ->color('danger')
                     ->url(fn (Call $record): string => self::getUrl('validate', ['callId' => $record]))
-                    ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation]))
+                    ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
+                Action::make('call_download')
+                    ->label('Download')
+                    ->button()
+                    ->color('success')
+                    ->url(fn (Call $record): string => route('call.download', $record->id), true)
+                    ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::Approved]))
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

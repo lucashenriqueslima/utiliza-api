@@ -13,9 +13,9 @@ class IlevaAccidentInvolved extends Model
     protected $connection = 'ileva';
     protected $table = 'hbrd_adm_sinister_participant';
     protected $guarded = [];
-    public static function getAccidentInvolvedForAuvoToSolidy(string $databaseConnection): array
+    public static function getAccidentInvolvedForAuvoToSolidy(): array
     {
-        return DB::connection($databaseConnection)
+        return DB::connection('ileva')
             ->select("
             SELECT DISTINCT
 	 par.id,
@@ -26,7 +26,7 @@ class IlevaAccidentInvolved extends Model
     par.nome,
     par.placa,
     par.cpf_cnpj cpfCnpj,
-        CONCAT(IFNULL(has.nome, ''), ' / ', IFNULL(has.endereco, ''), ' / ', IFNULL(city.cidade, ''), ' - ', IFNULL(state.uf, '')) address,
+    CONCAT(IFNULL(has.nome, ''), ' / ', IFNULL(has.endereco, ''), ' / ', IFNULL(city.cidade, ''), ' - ', IFNULL(state.uf, '')) address,
     par.telefone phone,
     par.email,
     par.id_sinister,
@@ -76,9 +76,9 @@ GROUP BY tipe.id_participant
         ");
     }
 
-    public static function getAccidentInvolvedForAuvoToMotoclub(string $databaseConnection): array
+    public static function getAccidentInvolvedForAuvoToMotoclub(): array
     {
-        return DB::connection($databaseConnection)
+        return DB::connection('ileva_motoclub')
             ->select("
             SELECT DISTINCT
 	 par.id,

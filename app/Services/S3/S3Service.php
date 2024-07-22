@@ -29,6 +29,15 @@ class S3Service
         }
     }
 
+    public static function filenameSanitizer(string $unsafeFilename)
+    {
+        $dangerousCharacters = array(" ", '"', "'", "&", "/", "\\", "?", "#");
+
+        $safe_filename = str_replace($dangerousCharacters, '_', $unsafeFilename);
+
+        return $safe_filename;
+    }
+
     public function getFileUrl($file): string
     {
         return Storage::url($file);

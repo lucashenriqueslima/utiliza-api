@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Arr;
 
 class ExpertiseFile extends Model
 {
@@ -22,6 +23,12 @@ class ExpertiseFile extends Model
             'file_expertise_type' => ExpertiseFileType::class,
         ];
     }
+
+    public function extension(): string
+    {
+        return Arr::last(explode('.', $this->path));
+    }
+
 
     public function expertise(): BelongsTo
     {

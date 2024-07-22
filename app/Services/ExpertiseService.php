@@ -13,9 +13,10 @@ use Laravel\Octane\Facades\Octane;
 class ExpertiseService
 {
 
-    public static function handleExpertiseThirdPartyFormTexts(Request $request, Expertise $expertise)
+    public static function handleExpertiseThirdPartyFormTexts(Request $request, Expertise $expertise, string $callId)
     {
         $thirdParty = $expertise->thirdParty()->create([
+            'call_id' => $callId,
             'name' => $request->name,
             'cpf' => $request->cpf,
             'phone' => $request->phone,
@@ -31,10 +32,34 @@ class ExpertiseService
     {
         $s3service = new S3Service(S3Prefix::Expertise);
 
-        self::uploadFile($request->video, $expertise, $s3service);
+        if ($request->video) {
+            self::uploadFile($request->video, $expertise, $s3service);
+        }
 
         foreach ($request->images as $image) {
             self::uploadFile($image, $expertise, $s3service);
+        }
+    }
+
+    public static function handleExpertiseSecondaryFormFiles(Request $request, Expertise $expertise): void
+    {
+        $s3service = new S3Service(S3Prefix::Expertise);
+
+
+        self::uploadFile($request->video_360, $expertise, $s3service);
+
+        self::uploadFile($request->biker_observation, $expertise, $s3service);
+
+        foreach ($request->witness_reports as $witness_report) {
+            if ($witness_report['file']) {
+                self::uploadFile($witness_report, $expertise, $s3service);
+            }
+        }
+
+        foreach ($request->commercial_facades as $commercial_facade) {
+            if ($commercial_facade['file']) {
+                self::uploadFile($commercial_facade, $expertise, $s3service);
+            }
         }
     }
 

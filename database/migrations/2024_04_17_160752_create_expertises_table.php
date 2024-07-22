@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->foreignId('call_id')->constrained('calls');
-            $table->integer('app_expertise_index');
+            $table->integer('main_expertise_group')->nullable();
+            $table->integer('app_expertise_index')->nullable();
             $table->enum('type', ['main', 'secondary']);
-            $table->enum('person_type', ['associate', 'third_party', 'eyewitness']);
+            $table->enum('person_type', ['associate', 'third_party', 'eyewitness'])->nullable();
             $table->enum('status', ['canceled', 'done', 'waiting', 'waiting_validate_from_others'])->nullable();
             $table->timestamps();
         });

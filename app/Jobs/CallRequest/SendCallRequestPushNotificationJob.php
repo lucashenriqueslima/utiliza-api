@@ -64,6 +64,8 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
             )->delay(now()->addSeconds(12));
         } catch (\Exception $e) {
 
+            Log::error($e->getMessage());
+
             HandleCallContinuityAfterCallRequestJob::dispatch(
                 $this->call,
                 $this->callRequest,
