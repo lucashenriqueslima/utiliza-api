@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseFileValidationErrorStatus;
 use App\Enums\ExpertisePersonType;
 use App\Enums\ExpertiseStatus;
 use App\Enums\ExpertiseType;
 use App\Http\Controllers\Controller;
 use App\Models\Call;
 use App\Models\Expertise;
+use App\Models\ExpertiseFileValidationError;
 use App\Services\CallService;
 use App\Services\S3\S3Service;
 use Illuminate\Http\Request;

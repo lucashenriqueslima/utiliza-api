@@ -3,6 +3,7 @@
 namespace App\Jobs\Call;
 
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseFileValidationErrorStatus;
 use App\Models\Biker;
 use App\Models\Call;
 use App\Services\Firebase\FirebaseAuthService;
@@ -40,7 +41,7 @@ class SendPushNotificationAfterValidationJob implements ShouldQueue
             $firebaseService->sendPushNotificationAfterValidation($this->bikerFirebaseToken, $existsValidationErrors);
 
             if ($existsValidationErrors) {
-                $this->call->validationErrors()->update(['status' => 'sent']);
+                $this->call->validationErrors()->update(['status' => ExpertiseFileValidationErrorStatus::Sent]);
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
