@@ -50,15 +50,20 @@ class ExpertiseService
 
         self::uploadFile($request->biker_observation, $expertise, $s3service);
 
-        foreach ($request->witness_reports as $witness_report) {
-            if ($witness_report['file']) {
-                self::uploadFile($witness_report, $expertise, $s3service);
+        if ($request->witness_reports) {
+            foreach ($request->witness_reports as $witness_report) {
+                if ($witness_report['file']) {
+                    self::uploadFile($witness_report, $expertise, $s3service);
+                }
             }
         }
 
-        foreach ($request->commercial_facades as $commercial_facade) {
-            if ($commercial_facade['file']) {
-                self::uploadFile($commercial_facade, $expertise, $s3service);
+
+        if ($request->commercial_facades) {
+            foreach ($request->commercial_facades as $commercial_facade) {
+                if ($commercial_facade['file']) {
+                    self::uploadFile($commercial_facade, $expertise, $s3service);
+                }
             }
         }
     }
@@ -75,12 +80,7 @@ class ExpertiseService
                 ],
             );
         } catch (S3Exception $e) {
-            $expertise->files()->create(
-                [
-                    'file_expertise_type' => $file['file_type'],
-                    'error_message' => $e->getMessage()
-                ],
-            );
-        };
+            // Log error
+        }
     }
 }
