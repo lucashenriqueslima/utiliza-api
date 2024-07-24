@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Arr;
 
@@ -35,8 +36,8 @@ class ExpertiseFile extends Model
         return $this->belongsTo(Expertise::class);
     }
 
-    public function validationErrors(): HasMany
+    public function validationErrors(): HasOne
     {
-        return $this->hasMany(ExpertiseFileValidationError::class);
+        return $this->hasOne(ExpertiseFileValidationError::class);
     }
 }
