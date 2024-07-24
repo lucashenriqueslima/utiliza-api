@@ -13,8 +13,7 @@ class ExpertiseFileValidationErrorController extends Controller
     public function index(Call $call)
     {
         $validationErrors = ExpertiseFileValidationError::with([
-            'expertiseFile' => fn ($query) => $query->select('id', 'expertise_file_id')
-                ->whereNull('is_approved')
+            'expertiseFile' => fn ($query) => $query->whereNull('is_approved')
         ])
             ->where('call_id', $call->id)
             ->get();
