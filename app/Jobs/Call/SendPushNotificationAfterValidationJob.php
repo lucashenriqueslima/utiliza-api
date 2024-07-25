@@ -40,9 +40,9 @@ class SendPushNotificationAfterValidationJob implements ShouldQueue
         try {
             $firebaseService->sendPushNotificationAfterValidation($this->bikerFirebaseToken, $existsValidationErrors);
 
-            if ($existsValidationErrors) {
-                $this->call->validationErrors()->update(['status' => ExpertiseFileValidationErrorStatus::Sent]);
-            }
+            // if ($existsValidationErrors) {
+            //     $this->call->validationErrors()->update(['status' => ExpertiseFileValidationErrorStatus::Sent]);
+            // }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
