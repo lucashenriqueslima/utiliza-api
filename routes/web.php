@@ -36,4 +36,9 @@ use Illuminate\Support\Facades\Response as Download;
 //     echo base_path() . '/firebase/fcm.json';
 // });
 
+//redirect to /admin
+Route::get('/', function () {
+    return redirect('/admin');
+});
+
 Route::get('/call/{call}/download', [CallController::class, 'download'])->name('call.download');
