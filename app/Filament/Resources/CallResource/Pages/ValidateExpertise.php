@@ -266,7 +266,9 @@ class ValidateExpertise extends Page implements HasForms
         $data = $this->form->getState();
 
         ExpertiseFileValidationError::where('call_id', $this->record->id)
-            ->update(['status' => ExpertiseFileValidationErrorStatus::Expired]);
+            ->update([
+                'status' => 'expired'
+            ]);
 
         $this->expertises
             ->each(function ($expertise) use ($data) {
