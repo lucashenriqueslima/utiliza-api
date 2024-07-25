@@ -12,7 +12,7 @@ class FirebaseAuthService
     private array $authencationData;
     public function __construct()
     {
-        $this->credentialsFilePath = "firebase/fcm.json";
+        $this->credentialsFilePath = base_path() . "/firebase/fcm.json";
         $this->googleClient = new Google_Client();
         $this->authencationData = $this->authenticate();
     }

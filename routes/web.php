@@ -32,4 +32,8 @@ use Illuminate\Support\Facades\Response as Download;
 //     }
 // });
 
+Route::get('/', function () {
+    echo base_path() . '/firebase/fcm.json';
+});
+
 Route::get('/call/{call}/download', [CallController::class, 'download'])->name('call.download');
