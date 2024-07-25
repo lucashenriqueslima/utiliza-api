@@ -4,6 +4,7 @@ namespace App\Filament\Resources\CallResource\Pages;
 
 use App\Enums\CallStatus;
 use App\Enums\ExpertiseFileType;
+use App\Enums\ExpertiseFileValidationErrorStatus;
 use App\Enums\ExpertisePersonType;
 use App\Enums\ExpertiseStatus;
 use App\Enums\ExpertiseType;
@@ -17,6 +18,7 @@ use App\Models\AssociateCar;
 use App\Models\Call;
 use App\Models\Expertise;
 use App\Models\ExpertiseFile;
+use App\Models\ExpertiseFileValidationError;
 use App\Models\ExpertiseFormInput;
 use App\Services\S3\S3Service;
 use Filament\Actions\Action;
@@ -262,6 +264,9 @@ class ValidateExpertise extends Page implements HasForms
         }
 
         $data = $this->form->getState();
+
+        ExpertiseFileValidationError::where('call_id', $this->record->id)
+            ->update(['status' => ExpertiseFileValidationErrorStatus::Expired]);
 
         $this->expertises
             ->each(function ($expertise) use ($data) {

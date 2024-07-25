@@ -43,10 +43,9 @@ class CallController extends Controller
 
             Expertise::whereIn('id', $expertisesIdToUpdate)
                 ->update(['status' => ExpertiseStatus::Waiting]);
-
-            ExpertiseFileValidationError::where('call_id', $call->id)
-                ->update(['status' => ExpertiseFileValidationErrorStatus::Expired]);
         }
+
+
 
         $call->update(['status' => $request->status]);
     }
