@@ -5,22 +5,23 @@
 </footer>
 
 <script>
-    setInterval(checkNotificationAudio, 30000);
+    setInterval(checkNotificationAudio, 10000);
 
     async function checkNotificationAudio() {
 
     try {
-        let databaseNotificationComponent = Livewire.all()[0]
+        let unreadNotificationsCountComponent = document.querySelector('span.truncate')
 
-        if(databaseNotificationComponent.name != 'filament.livewire.database-notifications') {
+        if(!unreadNotificationsCountComponent) {
             return;
         }
 
-        let unreadedNotifications =  await databaseNotificationComponent.$wire.getUnreadNotificationsCount()
-        if(unreadedNotifications > 0){
-            let audio = new Audio('{{url('/sound/notification.mp3')}}');
-            audio.play();
+        if(unreadNotificationsCountComponent.innerText == 0){
+            return;
         }
+
+        let audio = new Audio('{{url('/sound/notification.mp3')}}');
+            audio.play();
 
     } catch (error) {
 
