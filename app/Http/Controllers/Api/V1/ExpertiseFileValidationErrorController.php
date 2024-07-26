@@ -15,7 +15,7 @@ class ExpertiseFileValidationErrorController extends Controller
     {
         $validationErrors = ExpertiseFileValidationError::where('call_id', $call->id)
             ->with('expertiseFile.expertise')
-            ->where('status', '!=', ExpertiseFileValidationErrorStatus::Expired)
+            ->whereNull('status')
             ->get();
 
         return response()->json(ExpertiseFileValidaionErrorResource::collection(
