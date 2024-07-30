@@ -306,10 +306,10 @@ class ValidateExpertise extends Page implements HasForms
             'status' => CallStatus::WaitingBikerSeeValidation
         ]);
 
-        SendPushNotificationAfterValidationJob::dispatch(
-            $this->record,
-            $this->record->biker->firebase_token
-        );
+        // SendPushNotificationAfterValidationJob::dispatch(
+        //     $this->record,
+        //     $this->record->biker->firebase_token
+        // );
 
         Notification::make()
             ->title('Perícia validada com sucesso!')

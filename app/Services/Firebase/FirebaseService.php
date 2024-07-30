@@ -48,7 +48,7 @@ class FirebaseService
                         'distance' => Number::format($distanceInKm * 1.5, precision: 1),
                         'time' => (string) Number::format($distanceInKm * 3.5, precision: 0),
                         'price' => '50,00',
-                        'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(10),
+                        'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(25),
                     ],
                 ],
             ]);

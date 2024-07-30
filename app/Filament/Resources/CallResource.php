@@ -8,6 +8,7 @@ use App\Filament\Resources\CallResource\Actions\ExtractCoordinatesFromGoogleMaps
 use App\Filament\Resources\CallResource\Actions\ExtractCordinatesFromGoogleMapsUrl;
 use App\Filament\Resources\CallResource\Pages;
 use App\Helpers\FormatHelper;
+use App\Helpers\LinkGeneratorHelper;
 use App\Models\Associate;
 use App\Models\AssociateCar;
 use App\Models\Call;
@@ -261,6 +262,7 @@ class CallResource extends Resource
                     ->label('Associado | Telefone')
                     ->searchable()
                     ->sortable()
+                    ->url(fn (Call $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->associateCar->associate->phone), "Olá {$record->associateCar->associate->name}"), true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('associateCar.plate')
                     ->label('Associado | Placa')
@@ -284,7 +286,8 @@ class CallResource extends Resource
                         }
 
                         return $state;
-                    }),
+                    })
+                    ->url(fn (Call $record): string => LinkGeneratorHelper::googleMaps($record->location->longitude, $record->location->latitude), true),
                 TextColumn::make('status')
                     ->label('Status')
                     ->searchable()
@@ -328,6 +331,7 @@ class CallResource extends Resource
                     ->label('Motoboy | Telefone')
                     ->searchable()
                     ->sortable()
+                    ->url(fn (Call $record): ?string => $record->biker ? LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->biker?->phone), "Olá {$record->biker?->name}") : null, true)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

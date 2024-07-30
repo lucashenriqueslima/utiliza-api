@@ -61,7 +61,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
                 $this->bikers,
                 $this->firebaseAccessToken,
                 $this->distances,
-            )->delay(now()->addSeconds(12));
+            )->delay(now()->addSeconds(27));
         } catch (\Exception $e) {
 
             Log::error($e->getMessage());
@@ -72,7 +72,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
                 $this->bikers,
                 $this->firebaseAccessToken,
                 $this->distances,
-            )->delay(now()->addSeconds(12));
+            )->delay(now()->addSeconds(27));
             Log::error($e->getMessage());
         }
 
