@@ -9,9 +9,6 @@ class SendAuthenticationToken
 {
     public static function run(LocavibeRenter $renter, string $token)
     {
-
         $renter->notify(new AuthenticationTokenNotification($token));
     }
-
-
 }

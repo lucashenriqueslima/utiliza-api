@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\V1\CallRequestController;
 use App\Http\Controllers\Api\V1\FipeModelController;
 use App\Services\Auvo\AuvoService;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\V1\Auth\VerifyCpfController;
 use App\Http\Controllers\Api\V1\BikerController;
 use App\Http\Controllers\Api\V1\CallController;
 use App\Http\Controllers\Api\V1\ExpertiseController;
@@ -26,7 +26,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('auth')->group(function () {
 
-        Route::post('/verify-email', [VerifyEmailController::class, 'store']);
+        Route::post('/verify-cpf', [VerifyCpfController::class, 'store']);
         Route::post('/login', [LoginController::class, 'store']);
         Route::post('/associate/{associateId}/call', [LoginController::class, 'destroy']);
     });

@@ -34,9 +34,11 @@ class AuthenticationTokenNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
+            ->greeting('Olá!')
             ->subject('Token de autenticação')
             ->line('Um novo token de autenticação foi gerado para você.')
-            ->line('Seu token é: ' . $this->token);
+            ->line("Seu token é: {$this->token}")
+            ->salutation('Atenciosamente, Utiliza.');
     }
 
     /**

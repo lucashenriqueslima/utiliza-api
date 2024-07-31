@@ -40,6 +40,13 @@ class AuvoService
                     return $e->getMessage();
                 }
             },
+            function () {
+                try {
+                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvoToNova();
+                } catch (\Exception $e) {
+                    return $e->getMessage();
+                }
+            },
         ], 10000);
     }
 

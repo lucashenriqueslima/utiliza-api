@@ -2,13 +2,28 @@
 
 namespace App\Services\Auth;
 
-use App\Models\Locavibe\LocavibeRenter;
 use App\Models\Biker;
+use App\Models\Locavibe\LocavibeRenter;
+use Illuminate\Support\Str;
 
-class UpdateBikerAndMotorcycleFields
+class AuthService
 {
-    public static function run(LocavibeRenter $renter): Biker
-    {   
+
+    public static function generateAuthenticationToken(): string
+    {
+        return (string) rand(1000, 9999);
+    }
+
+    public static function maskEmail(string $email): string
+    {
+        $emailExploded = explode('@', $email);
+        $emailExploded[0] = Str::of($emailExploded[0])->mask('*', 3);
+
+        return implode('@', $emailExploded);
+    }
+
+    public static function UpdateOrCreateBikerAndMotorcycle(LocavibeRenter $renter): Biker
+    {
 
         $biker = Biker::updateOrCreate(
             ['locavibe_biker_id' => $renter->id],
@@ -28,7 +43,7 @@ class UpdateBikerAndMotorcycleFields
 
     private static function fillFieldsBiker($renter): array
     {
-       return [
+        return [
             'locavibe_biker_id' => $renter->id,
             'name' => $renter->name,
             'email' => $renter->email,

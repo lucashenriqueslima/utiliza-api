@@ -17,10 +17,11 @@ use Illuminate\Support\Facades\Response as Download;
 
 // Route::get('/auvo', function () {
 //     $auvoService = new AuvoService();
-//     [$solidyCustomers, $motoclubCustomers] = $auvoService->getIlevaDatabaseCustomers();
+//     [$solidyCustomers, $motoclubCustomers, $novaCustomers] = $auvoService->getIlevaDatabaseCustomers();
 
 //     $auvoService->updateCustomers($solidyCustomers);
 //     $auvoService->updateCustomers($motoclubCustomers, 'mc');
+//     $auvoService->updateCustomers($novaCustomers, 'nv');
 // });
 
 // Route::get('/field-control', function () {

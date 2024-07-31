@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MotorcycleResource;
 use App\Http\Resources\BikerResource;
 use App\Models\Locavibe\LocavibeRenter;
+use App\Services\Auth\AuthService;
 use App\Services\Auth\UpdateBikerAndMotorcycleFields;
 use App\Traits\HttpResponses;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,7 +21,7 @@ class LoginController extends Controller
             'cpf' => 'required|string|size:14',
             'auth_token' => 'required',
         ]);
-        
+
         try {
             $renter = LocavibeRenter::where('cpf', $request->cpf)
                 ->where('authToken', $request->auth_token)
@@ -32,8 +33,8 @@ class LoginController extends Controller
             ], 404);
         }
 
-        $biker = UpdateBikerAndMotorcycleFields::run($renter);
-        
+        $biker = AuthService::UpdateOrCreateBikerAndMotorcycle($renter);
+
         Auth::loginUsingId($biker->id);
 
         $renter->authTokenVerified = true;

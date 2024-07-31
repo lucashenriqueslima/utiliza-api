@@ -9,6 +9,7 @@ use App\Enums\CallStatus;
 use App\Jobs\CallRequest\SendCallRequestPushNotification;
 use App\Jobs\CallRequest\SendCallRequestPushNotificationJob;
 use App\Models\Biker;
+use App\Models\BikerChangeCall;
 use App\Models\Call;
 use App\Models\CallRequest;
 use App\Services\Firebase\FirebaseAuthService;
@@ -41,7 +42,11 @@ class StartLookingForBikerToCallJob implements ShouldQueue
     public function handle(): void
     {
 
+        $blockedUserIds = BikerChangeCall::where('call_id', $this->call->id)
+            ->where('created_at', '>', Carbon::now()->subMinutes(5))
+            ->pluck('biker_id');
 
+        Log::info('Blocked users: ' . $blockedUserIds->toJson());
 
         $this->bikers = Biker::selectRaw(
             '
@@ -54,6 +59,7 @@ class StartLookingForBikerToCallJob implements ShouldQueue
         )
             ->join('biker_geolocations', 'bikers.id', '=', 'biker_geolocations.biker_id')
             ->where('bikers.status', BikerStatus::Avaible->value)
+            ->whereNotIn('bikers.id', $blockedUserIds)
             ->orderBy('distance')
             ->get();
 
