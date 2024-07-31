@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseStatus;
 use App\Filament\Pages\ValidateExpertise;
 use App\Filament\Resources\CallResource\Actions\ExtractCoordinatesFromGoogleMapsUrl;
 use App\Filament\Resources\CallResource\Actions\ExtractCordinatesFromGoogleMapsUrl;
@@ -32,6 +33,8 @@ use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+
 
 use function PHPSTORM_META\map;
 
@@ -241,7 +244,6 @@ class CallResource extends Resource
     {
         return $table
             ->recordUrl(null)
-            ->defaultSort('status', 'desc')
             ->columns([
                 TextColumn::make('id')
                     ->label('Cód.')
@@ -333,7 +335,24 @@ class CallResource extends Resource
                     ->sortable()
                     ->url(fn (Call $record): ?string => $record->biker ? LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->biker?->phone), "Olá {$record->biker?->name}") : null, true)
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('validated_by')
+                    ->label('Validado(s) por:')
+                    ->searchable()
+                    ->sortable()
+                    ->getStateUsing(function ($record) {
+                        return $record->whereHas('expertises', function ($query) {
+                            $query->where('status', ExpertiseStatus::Done);
+                        })->with('expertises.user')->get()->pluck('expertises')
+                            ->flatten()
+                            ->pluck('user')
+                            ->pluck('name')
+                            ->unique()
+                            ->implode(', ');
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->reorderable('sort')
+            ->paginatedWhileReordering()
             ->filters([
                 SelectFilter::make('status')
                     ->multiple()
@@ -349,25 +368,54 @@ class CallResource extends Resource
                     ->default(['searching_biker', 'waiting_arrival', 'waiting_validation', 'in_service', 'in_validation', 'waiting_biker_see_validation'])
             ])
             ->actions([
-                Action::make('validate_expertise')
-                    ->label('Validar')
-                    ->button()
-                    ->icon('heroicon-o-eye')
-                    ->color('danger')
-                    ->url(fn (Call $record): string => self::getUrl('validate', ['callId' => $record]))
-                    ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
-                Action::make('call_download')
-                    ->label('Download')
-                    ->button()
-                    ->color('success')
-                    ->url(fn (Call $record): string => route('call.download', $record->id), true)
-                    ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::Approved]))
+                ActionGroup::make([
+                    Action::make('change_biker')
+                        ->label('Alterar Motoboy')
+                        ->icon('heroicon-o-arrow-path-rounded-square')
+                        ->color('primary')
+                        ->form([
+                            TextArea::make('reason_change_biker')
+                                ->label('Motivo da Troca')
+                                ->placeholder('Digite o motivo da troca de motoboy...')
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Call $record): void {
+
+                            $record->expertises()->update([
+                                'status' => ExpertiseStatus::ChangedBiker
+                            ]);
+
+                            $record->bikerChangeCalls()->create([
+                                'biker_id' => $record->biker_id,
+                                'user_id' => auth()->id(),
+                                'reason' => $data['reason_change_biker'],
+                            ]);
+
+                            $record->biker_id = null;
+                            $record->status = CallStatus::SearchingBiker;
+                            $record->save();
+
+                            Notification::make()
+                                ->title('A busca de um novo motoboy foi iniciada')
+                                ->success()
+                                ->send();
+                        })
+                        ->hidden(fn (Call $call): bool => $call->status == CallStatus::Approved),
+                    Action::make('validate_expertise')
+                        ->label('Validar')
+                        ->icon('heroicon-o-eye')
+                        ->color('danger')
+                        ->url(fn (Call $record): string => self::getUrl('validate', ['callId' => $record]))
+                        ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
+                    Action::make('call_download')
+                        ->label('Download')
+                        ->icon('heroicon-o-arrow-down-circle')
+                        ->color('success')
+                        ->url(fn (Call $record): string => route('call.download', $record->id), true)
+                        ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::Approved]))
+                ])
             ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ])
+            ->bulkActions([])
             ->poll('10s');
     }
 

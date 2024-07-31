@@ -298,7 +298,8 @@ class ValidateExpertise extends Page implements HasForms
 
 
         $this->expertises->toQuery()->update([
-            'status' => ExpertiseStatus::Done
+            'status' => ExpertiseStatus::Done,
+            'user_id' => auth()->id(),
         ]);
 
 

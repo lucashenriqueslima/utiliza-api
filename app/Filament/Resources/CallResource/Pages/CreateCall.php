@@ -34,11 +34,6 @@ class CreateCall extends CreateRecord
         );
     }
 
-    protected function afterCreate(): void
-    {
-        StartLookingForBikerToCallJob::dispatch($this->record);
-    }
-
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

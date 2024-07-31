@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\CallStatus;
 use App\Filament\Resources\CallResource;
 use App\Filament\Resources\CallResource\Pages\ValidateExpertise;
+use App\Jobs\Call\StartLookingForBikerToCallJob;
 use App\Models\Call;
 use App\Models\User;
 use Filament\Notifications\Notification;
@@ -19,7 +20,7 @@ class CallObserver
      */
     public function created(Call $call): void
     {
-        //
+        StartLookingForBikerToCallJob::dispatch($call);
     }
 
     /**
@@ -27,7 +28,11 @@ class CallObserver
      */
     public function updated(Call $call): void
     {
-        Log::info($call->id);
+
+        if (!$call->wasChanged('status')) {
+            return;
+        }
+
         if ($call->status === CallStatus::WaitingValidation) {
             Notification::make()
                 ->warning()
@@ -44,6 +49,15 @@ class CallObserver
                         ->openUrlInNewTab()
                 ])
                 ->sendToDatabase(User::select('id')->get());
+
+            return;
+        }
+
+        if (
+            $call->status === CallStatus::SearchingBiker &&
+            !$call->biker_id
+        ) {
+            StartLookingForBikerToCallJob::dispatch($call);
         }
     }
 

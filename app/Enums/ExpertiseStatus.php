@@ -8,4 +8,5 @@ enum ExpertiseStatus: string
     case Done = 'done';
     case WaitingValidateFromOthers = 'waiting_validate_from_others';
     case Waiting = 'waiting';
+    case ChangedBiker = 'changed_biker';
 }

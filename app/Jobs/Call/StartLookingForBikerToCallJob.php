@@ -59,6 +59,7 @@ class StartLookingForBikerToCallJob implements ShouldQueue
 
         if ($this->bikers->isEmpty()) {
             StartLookingForBikerToCallJob::dispatch($this->call)->delay(now()->addMinutes(2));
+            return;
         }
 
         SendCallRequestPushNotificationJob::dispatch(

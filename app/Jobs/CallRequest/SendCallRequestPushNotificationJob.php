@@ -48,7 +48,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
         ]);
 
         try {
-            $firebaseService->sendCallRequestPushNotification(
+            $result = $firebaseService->sendCallRequestPushNotification(
                 $this->call,
                 $this->callRequest,
                 $biker,
@@ -75,15 +75,5 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
             )->delay(now()->addSeconds(27));
             Log::error($e->getMessage());
         }
-
-        // $this->bikers = array_shift($this->bikers);
-
-        // dispatch(new HandleCallContinuityAfterCallRequestJob(
-        //     $this->callId,
-        //     $this->callRequest->id,
-        //     $this->bikers,
-        //     $this->firebaseAccessToken
-        // ))
-        //     ->delay(now()->addSeconds(12));
     }
 }

@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class ExpertiseFileValidationErrorController extends Controller
 {
-    public function index(Call $call)
+    public function index(string $callId)
     {
-        $validationErrors = ExpertiseFileValidationError::where('call_id', $call->id)
+        $validationErrors = ExpertiseFileValidationError::where('call_id', $callId)
             ->with('expertiseFile.expertise')
             ->whereNull('status')
             ->get();

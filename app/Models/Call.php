@@ -58,6 +58,11 @@ class Call extends Model
         return $this->belongsTo(Biker::class);
     }
 
+    public function bikerChangeCalls(): HasMany
+    {
+        return $this->hasMany(BikerChangeCall::class);
+    }
+
     public function expertises(): HasMany
     {
         return $this->hasMany(Expertise::class);

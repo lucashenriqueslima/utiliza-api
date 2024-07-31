@@ -16,6 +16,11 @@ class Biker extends Authenticatable
     protected $guarded = [];
 
 
+    public function bikerChangeCalls(): HasMany
+    {
+        return $this->hasMany(BikerChangeCall::class);
+    }
+
     public function call(): HasMany
     {
         return $this->hasMany(Call::class);

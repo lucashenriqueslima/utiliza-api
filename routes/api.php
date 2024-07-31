@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\CallController;
 use App\Http\Controllers\Api\V1\ExpertiseController;
 use App\Http\Controllers\Api\V1\ExpertiseFileValidationErrorController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
+use App\Http\Controllers\BikerChangeCallController;
 
 Route::get('/', function () {
     return ['Laravel' => app()->version()];
@@ -48,6 +49,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('call/{call}', [CallController::class, 'update']);
         Route::post('call/{call}/expertise/create', [ExpertiseController::class, 'store']);
 
-        Route::get('/call/{call}/expertise/file-validation-errors', [ExpertiseFileValidationErrorController::class, 'index']);
+        Route::get('/call/{callId}/expertise/file-validation-errors', [ExpertiseFileValidationErrorController::class, 'index']);
+
+        Route::get('/call/{call}/biker-change-call/reason', [BikerChangeCallController::class, 'showReason']);
     });
 });
