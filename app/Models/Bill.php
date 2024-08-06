@@ -23,6 +23,7 @@ class Bill extends Model
         static::creating(function ($bill) {
             $bill->value = CallValue::where('is_valid', true)
                 ->latest()
+                ->first()
                 ->value;
 
             #next friday day

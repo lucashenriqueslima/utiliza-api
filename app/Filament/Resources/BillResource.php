@@ -103,6 +103,11 @@ class BillResource extends Resource
                     ->modalSubmitActionLabel('Salvar')
             ])
             ->columns([
+                TextColumn::make('call.id')
+                    ->label('Cód.')
+                    ->searchable()
+                    ->configure()
+                    ->sortable(),
                 TextColumn::make('call.biker.name')
                     ->label('Nome')
                     ->searchable()
@@ -115,10 +120,6 @@ class BillResource extends Resource
                         fn (Bill $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->call->biker->phone), "Olá {$record->call->biker->name}"),
                         shouldOpenInNewTab: true
                     ),
-                TextColumn::make('call.biker.pix_key')
-                    ->label('Chave PIX')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('value')
                     ->label('Valor')
                     ->money('BRL', locale: 'pt-BR')

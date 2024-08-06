@@ -18,7 +18,7 @@ class CallValue extends Model
 
     public function getValidValueAttribute()
     {
-        return FormatHelper::numberLocale($this->where('is_valid', true)
+        return FormatHelper::currency($this->where('is_valid', true)
             ->latest()
             ->first()
             ->value);
