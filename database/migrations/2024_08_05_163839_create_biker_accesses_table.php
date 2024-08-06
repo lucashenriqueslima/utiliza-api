@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('biker_accesses', function (Blueprint $table) {
             $table->id();
-            $table->id();
             $table->foreignId('biker_id')->constrained('bikers');
             $table->string('device_id');
             $table->string('device_name');
