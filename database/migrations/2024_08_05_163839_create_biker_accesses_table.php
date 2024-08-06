@@ -20,7 +20,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamp('came_out_in')->nullable();
             $table->timestamps();
-            $table->timestamps();
         });
     }
 
