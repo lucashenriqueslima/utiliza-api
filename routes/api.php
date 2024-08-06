@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\BikerGeolocationController;
+use App\Http\Controllers\Api\V1\BillController;
 use App\Http\Controllers\Api\V1\CallRequestController;
 use App\Http\Controllers\Api\V1\FipeModelController;
 use App\Services\Auvo\AuvoService;
@@ -45,6 +46,7 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [LogoutController::class, 'destroy']);
         Route::get('/fipe/brand/{brandId}/model/{name?}', [FipeModelController::class, 'indexByBrandIdAndName']);
 
+        Route::get('biker/{bikerId}/bills', [BillController::class, 'indexByBikerId']);
         Route::get('call/{id}/status', [CallController::class, 'showStatus']);
         Route::patch('call/{call}', [CallController::class, 'update']);
         Route::post('call/{call}/expertise/create', [ExpertiseController::class, 'store']);

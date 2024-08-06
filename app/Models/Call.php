@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[ObservedBy([CallObserver::class])]
 class Call extends Model
@@ -61,6 +62,11 @@ class Call extends Model
     public function bikerChangeCalls(): HasMany
     {
         return $this->hasMany(BikerChangeCall::class);
+    }
+
+    public function bill(): HasOne
+    {
+        return $this->hasOne(Bill::class);
     }
 
     public function expertises(): HasMany

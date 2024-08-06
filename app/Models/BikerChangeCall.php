@@ -12,6 +12,10 @@ class BikerChangeCall extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_delivered' => 'boolean',
+    ];
+
     public function biker(): BelongsTo
     {
         return $this->belongsTo(Biker::class);

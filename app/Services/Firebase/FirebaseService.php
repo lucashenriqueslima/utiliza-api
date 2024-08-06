@@ -5,13 +5,13 @@ namespace App\Services\Firebase;
 use App\Models\Biker;
 use App\Models\Call;
 use App\Models\CallRequest;
-use AWS\CRT\Log;
+use App\Models\CallValue;
 use Carbon\Carbon;
 use Google_Client;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Number;
-use Illuminate\Support\Facades\Log as FacadesLog;
+use Illuminate\Support\Facades\Log;
 
 class FirebaseService
 {
@@ -47,17 +47,19 @@ class FirebaseService
                         'address' => $call->address,
                         'distance' => Number::format($distanceInKm * 1.5, precision: 1),
                         'time' => (string) Number::format($distanceInKm * 3.5, precision: 0),
-                        'price' => '50,00',
+                        'price' => (new CallValue())->getValidValueAttribute(),
                         'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(25),
                     ],
                 ],
             ]);
 
             if ($response->status() !== 200) {
-                FacadesLog::error($response->body());
+                Log::error($response->body());
             }
+
+            Log::info($response->body());
         } catch (\Exception $e) {
-            FacadesLog::error($e->getMessage());
+            Log::error($e->getMessage());
             throw $e;
         }
     }
@@ -87,7 +89,7 @@ class FirebaseService
                 throw new \Exception('Erro ao enviar notificação.');
             }
         } catch (\Exception $e) {
-            FacadesLog::error($e->getMessage());
+            Log::error($e->getMessage());
             throw $e;
         }
     }

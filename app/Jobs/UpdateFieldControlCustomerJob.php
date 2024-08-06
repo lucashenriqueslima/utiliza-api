@@ -46,12 +46,11 @@ class UpdateFieldControlCustomerJob implements ShouldQueue
 
             foreach ($items as $item) {
                 if ($item['code'] == $this->customer->code && $item['archived'] == false) {
-                    // Log::info("Customer {$this->customer->name} already exists in Field Control");
+                    HandleFieldControlCustomerPhoneNumberJob::dispatch($item['id'], $this->customer->phone_number);
+
                     return;
                 }
             }
-
-            sleep(1);
 
             try {
                 $response = $client->post(
@@ -80,11 +79,13 @@ class UpdateFieldControlCustomerJob implements ShouldQueue
                     ]
                 );
 
+                sleep(1);
 
                 if (!in_array($response->status(), [200, 201])) {
                     Log::error("Error updating customer {$this->customer->name}:  {$response->body()}");
                 }
-                Log::info($response->json());
+
+                HandleFieldControlCustomerPhoneNumberJob::dispatch($response->json()['id'], $this->customer->phone_number);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }

@@ -50,12 +50,10 @@ class UpdateFieldControlCustomerPhoneNumberJob implements ShouldQueue
             foreach ($items as $item) {
                 if ($item['code'] == $this->customer->code && $item['archived'] == false) {
                     $customerId = $item['id'];
-                    // Log::info("Customer {$this->customer->name} already exists in Field Control");
+
                     continue;
                 }
             }
-
-            sleep(1);
 
             try {
                 $response = $client->post(

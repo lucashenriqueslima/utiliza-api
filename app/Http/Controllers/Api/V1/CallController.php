@@ -21,7 +21,6 @@ use ZipArchive;
 
 class CallController extends Controller
 {
-
     public function update(Request $request, Call $call)
     {
 
@@ -102,7 +101,6 @@ class CallController extends Controller
 
             return response()->download($zipFile)->deleteFileAfterSend(true);
         } catch (\Exception $e) {
-            dd($e);
             return response()->json(['error' => 'Erro ao processar o download: ' . $e->getMessage()], 500);
         }
     }

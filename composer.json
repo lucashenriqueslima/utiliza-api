@@ -17,6 +17,8 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.28",
         "matanyadaev/laravel-eloquent-spatial": "^4.2",
+        "php-mqtt/client": "^2.1",
+        "php-mqtt/laravel-client": "^1.5",
         "stechstudio/laravel-zipstream": "^5.0"
     },
     "require-dev": {

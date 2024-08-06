@@ -2,6 +2,10 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Number;
+use Illuminate\Support\Str;
+
 class FormatHelper
 {
     public static function cpfOrCnpj(string $cpfOrCnpj): string
@@ -26,5 +30,24 @@ class FormatHelper
     public static function onlyNumbers(string $value): string
     {
         return preg_replace('/[^0-9]/', '', $value);
+    }
+
+    public static function numberLocale(int|float $value): string
+    {
+        return Number::format($value, precision: 2);
+    }
+
+    public static function number(mixed $value): string
+    {
+        return Str::replace(',', '.', (string) $value);
+    }
+    public static function currency(int|float $value): string
+    {
+        return Number::currency($value, 'BRL', locale: 'pt_BR');
+    }
+
+    public static function date(string $date): string
+    {
+        return Carbon::parse($date)->format('d/m/Y');
     }
 }
