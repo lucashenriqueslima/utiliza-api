@@ -28,8 +28,6 @@ class CallController extends Controller
 
             $expertisesIdToUpdate = [];
 
-            Log::info($request->main_expertise_group);
-
             $call->expertises->each(function ($expertise) use (&$expertisesIdToUpdate, $request) {
                 if (
                     !$expertise->status &&
