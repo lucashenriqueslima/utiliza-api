@@ -38,8 +38,6 @@ class HandleFieldControlCustomerPhoneNumberJob implements ShouldQueue
 
             $response = $client->get("https://carchost.fieldcontrol.com.br/customers/{$this->id}/phones");
 
-            Log::info("Phone number " . print_r($response->json()['items']) . " already exists in Field Control");
-
             if (!empty($response->json()['items'])) {
                 return;
             }

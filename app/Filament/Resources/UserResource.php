@@ -48,16 +48,15 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nome')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
+                    ->label('E-mail')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->date()
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('updated_at')
+                    ->label('Criado em')
                     ->date()
                     ->searchable()
                     ->sortable(),

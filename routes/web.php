@@ -24,13 +24,13 @@ use Illuminate\Support\Facades\Response as Download;
 //     $auvoService->updateCustomers($novaCustomers, 'nv');
 // });
 
-Route::get('/field-control', function () {
-    $customers = IlevaAssociateVehicle::getVehiclesForFieldControl();
+// Route::get('/field-control', function () {
+//     $customers = IlevaAssociateVehicle::getVehiclesForFieldControl();
 
-    foreach ($customers as $customer) {
-        UpdateFieldControlCustomerJob::dispatch($customer);
-    }
-});
+//     foreach ($customers as $customer) {
+//         UpdateFieldControlCustomerJob::dispatch($customer);
+//     }
+// });
 
 // Route::get('/', function () {
 //     echo base_path() . '/firebase/fcm.json';

@@ -5,27 +5,34 @@
 </footer>
 
 <script>
-    setInterval(checkNotificationAudio, 10000);
+    (function() {
 
-    async function checkNotificationAudio() {
-
-    try {
-        let unreadNotificationsCountComponent = document.querySelector('span.truncate')
-
-        if(!unreadNotificationsCountComponent) {
-            return;
+        if(typeof handleNotificationSoundInterval != 'undefined') {
+            clearInterval(handleNotificationSoundInterval);
         }
 
-        if(unreadNotificationsCountComponent.innerText == 0){
-            return;
+        handleNotificationSoundInterval = setInterval(handleNotificationSound, 3000);
+
+        async function handleNotificationSound() {
+
+        try {
+            let unreadNotificationsCountComponent = document.querySelector('span.truncate')
+
+            if(!unreadNotificationsCountComponent) {
+                return;
+            }
+
+            if(unreadNotificationsCountComponent.innerText == 0){
+                return;
+            }
+
+            let audio = new Audio('{{url('/sound/notification.mp3')}}');
+                audio.play();
+
+        } catch (error) {
+            console.error(error);
         }
 
-        let audio = new Audio('{{url('/sound/notification.mp3')}}');
-            audio.play();
-
-    } catch (error) {
-
-    }
-
-    }
+        }
+    })();
 </script>

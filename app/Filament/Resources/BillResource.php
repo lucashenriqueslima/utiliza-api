@@ -153,7 +153,7 @@ class BillResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->action(fn (Collection $records) => $records->update(['status' => BillStatus::Paid])),
+                    ->action(fn (Collection $records) => $records->each(fn (Bill $record) => $record->update(['status' => BillStatus::Paid->value]))),
             ]);
     }
 
