@@ -2,14 +2,14 @@
     <h1 class="text-3xl font-bold text-center text-gray-800 my-7">Modelos de Fotos</h1>
     <div class="flex flex-row">
         <img
-        src="{{ asset('img/photo-models-expertise.jpg') }}"
+        src="{{ asset('img/photo-models-expertise.png') }}"
         alt="Modelos de Fotos para Perícia"
-        class="h-dvh w-1/2">
+        class="w-1/2">
 
         <img
-        src="{{ asset('img/photo-models-expertise-2.jpg') }}"
+        src="{{ asset('img/photo-models-expertise-2.png') }}"
         alt="Modelos de Fotos para Perícia"
-        class="h-dvh w-1/2">
+        class="w-1/2">
     </div>
 
     <h1 class="text-3xl font-bold text-center text-gray-800 my-7">Formulário de Fotos</h1>
