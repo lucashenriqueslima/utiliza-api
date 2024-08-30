@@ -16,10 +16,25 @@ class ExpertiseFileValidaionErrorResource extends JsonResource
     {
 
         return [
-            'app_index' => (string)$this->expertiseFile->expertise->app_expertise_index,
-            'person_type' => $this->expertiseFile->expertise->person_type,
-            'file_type' => $this->expertiseFile->file_expertise_type,
-            'error_message' => $this->error_message,
+            'call_id' => $this->id,
+            'biker_id' => $this->biker_id,
+            'validation_errors' => $this->validationErrors->map(function ($validationError) {
+                return [
+                    'error_message' => $validationError->error_message,
+                    'app_expertise_index' => (string) $validationError->expertiseFile->expertise->app_expertise_index,
+                    'file_expertise_type' => $validationError->expertiseFile->file_expertise_type,
+                    'person_type' => $validationError->expertiseFile->expertise->person_type,
+                    'expertise_file' => [
+                        'id' => $validationError->expertiseFile->id,
+                        'file_expertise_type' => $validationError->expertiseFile->file_expertise_type,
+                        'expertise' => [
+                            'id' => $validationError->expertiseFile->expertise->id,
+                            'app_expertise_index' => $validationError->expertiseFile->expertise->app_expertise_index,
+                            'person_type' => $validationError->expertiseFile->expertise->person_type,
+                        ],
+                    ],
+                ];
+            }),
         ];
     }
 }

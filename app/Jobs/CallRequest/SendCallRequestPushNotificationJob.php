@@ -29,8 +29,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
         protected array $distances,
         protected string $firebaseAccessToken,
 
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -48,7 +47,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
         ]);
 
         try {
-            $result = $firebaseService->sendCallRequestPushNotification(
+            $firebaseService->sendCallRequestPushNotification(
                 $this->call,
                 $this->callRequest,
                 $biker,

@@ -2,21 +2,18 @@
 
 namespace App\Enums;
 
-enum VehicleType: string 
+use Filament\Support\Contracts\HasLabel;
+
+enum VehicleType: string implements HasLabel
 {
-    case Car = 'carro';
-    case Motorcycle = 'moto';
-    case Truck = 'caminhao';
-    case Other = 'outros';
+    case Car = 'car';
+    case Motorcycle = 'motorcycle';
 
     public function getLabel(): string
     {
         return match ($this) {
             self::Car => 'Carro',
             self::Motorcycle => 'Moto',
-            self::Truck => 'Caminhão',
-            self::Other => 'Outro',
         };
     }
 }
-    

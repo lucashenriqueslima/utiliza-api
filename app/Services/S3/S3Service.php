@@ -10,13 +10,13 @@ use Illuminate\Support\Facades\Log;
 
 class S3Service
 {
-    public function __construct(private S3Prefix $prefix)
-    {
-    }
+    public function __construct(private S3Prefix $prefix) {}
 
-    public static function getUrl(string $filePath): string
+
+
+    public static function getUrl(?string $filePath): ?string
     {
-        return Storage::url($filePath);
+        return $filePath ? Storage::url($filePath) : null;
     }
 
     public function uploadFile(mixed $file, ?S3Prefix $prefix = null)
@@ -28,6 +28,8 @@ class S3Service
             return $e->getMessage();
         }
     }
+
+
 
     public static function filenameSanitizer(string $unsafeFilename)
     {

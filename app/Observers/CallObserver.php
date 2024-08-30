@@ -3,10 +3,12 @@
 namespace App\Observers;
 
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseStatus;
 use App\Filament\Resources\CallResource;
 use App\Filament\Resources\CallResource\Pages\ValidateExpertise;
 use App\Jobs\Call\StartLookingForBikerToCallJob;
 use App\Models\Call;
+use App\Models\Expertise;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
@@ -34,8 +36,8 @@ class CallObserver
         }
 
         match ($call->status) {
-            CallStatus::WaitingValidation => $this->handleWaitingValidation($call),
             CallStatus::SearchingBiker => $this->handleSearchingBiker($call),
+            CallStatus::WaitingValidation => $this->handleWaitingValidation($call),
             CallStatus::Approved => $this->handleApproved($call),
             default => null,
         };
@@ -64,6 +66,9 @@ class CallObserver
     {
         if (!$call->biker_id) {
             StartLookingForBikerToCallJob::dispatch($call);
+
+            Expertise::where('call_id', $call->id)
+                ->update(['status' => ExpertiseStatus::Canceled]);
         }
     }
 

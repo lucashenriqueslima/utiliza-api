@@ -9,7 +9,7 @@ class CallService
 {
 
 
-    public static function extractCoordinatesFromGoogleMapsUrl(string $url): ?array
+    public function extractCoordinatesFromGoogleMapsUrl(string $url): ?array
     {
 
         $pattern2 = '/maps\?q=(-?\d+\.\d+),(-?\d+\.\d+)/';
@@ -31,7 +31,7 @@ class CallService
         ];
     }
 
-    public static function cleanupTempFiles($files, $tempDir)
+    public function cleanupTempFiles($files, $tempDir)
     {
         foreach ($files as $localFilename) {
             unlink($tempDir . '/' . $localFilename);
@@ -40,7 +40,7 @@ class CallService
     }
 
 
-    public static function createZipArchive($files, $tempDir)
+    public function createZipArchive($files, $tempDir)
     {
         $zip = new ZipArchive();
         $zipFile = storage_path('app/public/chamado.zip');
@@ -64,7 +64,7 @@ class CallService
     }
 
 
-    public static function checkIfCallWasAccepted(CallStatus $status)
+    public function checkIfCallWasAccepted(CallStatus $status)
     {
         if ($status != CallStatus::SearchingBiker) {
             return true;

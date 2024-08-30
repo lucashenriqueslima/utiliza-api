@@ -7,6 +7,7 @@ use App\Enums\CallRequestStatus;
 use App\Enums\CallStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Biker;
+use App\Models\BikerChangeCall;
 use App\Models\Call;
 use App\Models\CallRequest;
 use App\Services\Firebase\FirebaseService;
@@ -21,10 +22,10 @@ class BikerController extends Controller
         // $bikers = DB::select(
         //     'SELECT bikers.id,
         //     firebase_token,
-        //     ST_Distance_Sphere(POINT(?, ?), location) AS distance 
-        //     FROM biker_geolocations 
+        //     ST_Distance_Sphere(POINT(?, ?), location) AS distance
+        //     FROM biker_geolocations
         //     INNER JOIN bikers ON bikers.id = biker_geolocations.biker_id
-        //     WHERE bikers.status = ? 
+        //     WHERE bikers.status = ?
         //     -- AND biker_geolocations.updated_at > NOW() - INTERVAL 100 MINUTE
         //     ORDER BY distance',
         //     [
@@ -77,11 +78,19 @@ class BikerController extends Controller
     {
         $request->validate([
             'status' => 'required|in:avaible,not_avaible,busy',
+            'has_changed_biker' => 'required|boolean',
         ]);
 
         $biker->update(
             $request->only('status')
         );
+
+        if ($request->has_changed_biker === true) {
+            BikerChangeCall::where('biker_id', $biker->id)
+                ->update([
+                    'is_delivered' => true
+                ]);
+        }
 
         return response(status: 200);
     }

@@ -43,7 +43,6 @@ class StartLookingForBikerToCallJob implements ShouldQueue
     {
 
         $blockedUserIds = BikerChangeCall::where('call_id', $this->call->id)
-            ->where('created_at', '>', Carbon::now()->subMinutes(5))
             ->pluck('biker_id');
 
         Log::info('Blocked users: ' . $blockedUserIds->toJson());

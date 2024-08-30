@@ -29,7 +29,7 @@ RUN apt-get update \
        php8.3-intl php8.3-readline \
        php8.3-ldap \
        php8.3-msgpack php8.3-igbinary php8.3-redis php8.3-swoole \
-       php8.3-swoole php8.3-mongodb \  
+       php8.3-swoole php8.3-mongodb \
        php8.3-memcached php8.3-pcov php8.3-imagick php8.3-xdebug \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -59,6 +59,11 @@ RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 COPY start-container /usr/local/bin/start-container
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY php.ini /etc/php/8.3/cli/conf.d/99-sail.ini
+
+COPY aws-mqtt-ca1.pem /var/www/certs/aws-mqtt-ca1.pem
+COPY aws-mqtt-private.pem.key /var/www/certs/aws-mqtt-private.pem.key
+COPY aws-mqtt-certificate.pem.crt /var/www/certs/aws-mqtt-certificate.pem.crt
+
 RUN chmod +x /usr/local/bin/start-container
 
 EXPOSE 8000

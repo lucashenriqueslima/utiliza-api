@@ -21,6 +21,6 @@ class CallValue extends Model
         return FormatHelper::currency($this->where('is_valid', true)
             ->latest()
             ->first()
-            ->value);
+            ->value ?? '50');
     }
 }

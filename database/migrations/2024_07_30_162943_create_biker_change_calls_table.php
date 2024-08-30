@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('call_id')->constrained()->cascadeOnDelete();
             $table->foreignId('biker_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->boolean('is_delivered')->default(false);
             $table->string('reason');
             $table->timestamps();
         });

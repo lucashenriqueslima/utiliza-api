@@ -5,13 +5,10 @@ namespace App\Filament\Resources;
 use App\Enums\CallStatus;
 use App\Enums\ExpertiseStatus;
 use App\Filament\Pages\ValidateExpertise;
-use App\Filament\Resources\CallResource\Actions\ExtractCoordinatesFromGoogleMapsUrl;
-use App\Filament\Resources\CallResource\Actions\ExtractCordinatesFromGoogleMapsUrl;
 use App\Filament\Resources\CallResource\Pages;
 use App\Helpers\FormatHelper;
 use App\Helpers\LinkGeneratorHelper;
 use App\Models\Associate;
-use App\Models\AssociateCar;
 use App\Models\Call;
 use App\Models\Ileva\IlevaAssociate;
 use App\Models\Ileva\IlevaAssociateVehicle;
@@ -34,6 +31,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
+use Illuminate\Support\Facades\Auth;
 
 
 use function PHPSTORM_META\map;
@@ -61,8 +59,8 @@ class CallResource extends Resource
                         ->placeholder('Selecione um associado')
                         ->searchable()
                         ->searchDebounce(300)
-                        ->required(fn (Get $get) => (!$get('temp_associate_id')))
-                        ->disabled(fn (Get $get) => ($get('temp_associate_id')))
+                        ->required(fn(Get $get) => (!$get('temp_associate_id')))
+                        ->disabled(fn(Get $get) => ($get('temp_associate_id')))
                         ->live()
                         ->createOptionForm([
                             Section::make('Associado')
@@ -134,7 +132,7 @@ class CallResource extends Resource
                             return 'Associado Criado';
                         })
                         ->getSearchResultsUsing(
-                            fn (string $search): array =>
+                            fn(string $search): array =>
 
 
                             IlevaAssociate::select('hbrd_asc_associado.id', 'hbrd_asc_pessoa.nome')
@@ -151,19 +149,19 @@ class CallResource extends Resource
                                 ->where('hbrd_asc_pessoa.nome', 'like', "%" . $search . "%")
                                 ->limit(50)
                                 ->get()
-                                ->mapWithKeys(fn ($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? '0') . ' dia(s) de atraso'])
+                                ->mapWithKeys(fn($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? '0') . ' dia(s) de atraso'])
                                 ->toArray()
                         )
-                        ->getOptionLabelUsing(fn ($value) => IlevaAssociate::find($value)->person->nome ?? $value),
+                        ->getOptionLabelUsing(fn($value) => IlevaAssociate::find($value)->person->nome ?? $value),
                     Select::make('associate_vehicle_id')
                         ->label('Veículo')
                         ->placeholder('Selecione um veículo')
-                        ->required(fn (Get $get) => (!$get('temp_associate_id')))
-                        ->disabled(fn (Get $get) => (!$get('associate_id') || $get('temp_associate_id')))
-                        ->options(fn (Get $get): array => IlevaAssociateVehicle::where('id_associado', $get('associate_id'))
+                        ->required(fn(Get $get) => (!$get('temp_associate_id')))
+                        ->disabled(fn(Get $get) => (!$get('associate_id') || $get('temp_associate_id')))
+                        ->options(fn(Get $get): array => IlevaAssociateVehicle::where('id_associado', $get('associate_id'))
                             ->pluck('placa', 'id')
                             ->toArray())
-                        ->getOptionLabelUsing(fn ($value) => IlevaAssociateVehicle::find($value)->placa ?? $value),
+                        ->getOptionLabelUsing(fn($value) => IlevaAssociateVehicle::find($value)->placa ?? $value),
                 ]),
 
                 Section::make()->columns(1)->schema([
@@ -187,7 +185,7 @@ class CallResource extends Resource
                                 return;
                             }
 
-                            $coordinates = CallService::extractCoordinatesFromGoogleMapsUrl($state);
+                            $coordinates = (new CallService())->extractCoordinatesFromGoogleMapsUrl($state);
 
                             if (!$coordinates) {
                                 Notification::make()
@@ -222,7 +220,7 @@ class CallResource extends Resource
                             'searchBoxControl'  => false, // creates geocomplete field inside map
                             'zoomControl'       => false,
                         ])
-                        ->height(fn () => '400px') // map height (width is controlled by Filament options)
+                        ->height(fn() => '400px') // map height (width is controlled by Filament options)
                         ->defaultZoom(12) // default zoom level when opening form
                         ->autocomplete(
                             fieldName: 'address',
@@ -265,7 +263,7 @@ class CallResource extends Resource
                     ->label('Associado | Telefone')
                     ->searchable()
                     ->sortable()
-                    ->url(fn (Call $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->associateCar->associate->phone), "Olá {$record->associateCar->associate->name}"), true)
+                    ->url(fn(Call $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->associateCar->associate->phone), "Olá {$record->associateCar->associate->name}"), true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('associateCar.plate')
                     ->label('Associado | Placa')
@@ -290,7 +288,7 @@ class CallResource extends Resource
 
                         return $state;
                     })
-                    ->url(fn (Call $record): string => LinkGeneratorHelper::googleMaps($record->location->longitude, $record->location->latitude), true),
+                    ->url(fn(Call $record): string => LinkGeneratorHelper::googleMaps($record->location->longitude, $record->location->latitude), true),
                 TextColumn::make('status')
                     ->label('Status')
                     ->searchable()
@@ -334,7 +332,7 @@ class CallResource extends Resource
                     ->label('Motoboy | Telefone')
                     ->searchable()
                     ->sortable()
-                    ->url(fn (Call $record): ?string => $record->biker ? LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->biker?->phone), "Olá {$record->biker?->name}") : null, true)
+                    ->url(fn(Call $record): ?string => $record->biker ? LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->biker?->phone), "Olá {$record->biker?->name}") : null, true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('validated_by')
                     ->label('Validado(s) por:')
@@ -388,7 +386,7 @@ class CallResource extends Resource
 
                             $record->bikerChangeCalls()->create([
                                 'biker_id' => $record->biker_id,
-                                'user_id' => auth()->id(),
+                                'user_id' => Auth::id(),
                                 'reason' => $data['reason_change_biker'],
                             ]);
 
@@ -401,19 +399,19 @@ class CallResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->hidden(fn (Call $call): bool => $call->status == CallStatus::Approved),
+                        ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
                     Action::make('validate_expertise')
                         ->label('Validar')
                         ->icon('heroicon-o-eye')
                         ->color('danger')
-                        ->url(fn (Call $record): string => self::getUrl('validate', ['callId' => $record]))
-                        ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
+                        ->url(fn(Call $record): string => self::getUrl('validate', ['callId' => $record]))
+                        ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
                     Action::make('call_download')
                         ->label('Download')
                         ->icon('heroicon-o-arrow-down-circle')
                         ->color('success')
-                        ->url(fn (Call $record): string => route('call.download', $record->id), true)
-                        ->hidden(fn (Call $call): bool => !in_array($call->status, [CallStatus::Approved]))
+                        ->url(fn(Call $record): string => route('call.download', $record->id), true)
+                        ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::Approved]))
                 ])
             ])
             ->bulkActions([])

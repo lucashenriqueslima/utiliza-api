@@ -57,15 +57,17 @@ class CallController extends Controller
             ]);
     }
 
-    public function download(Call $call)
-    {
+    public function download(
+        Call $call,
+        CallService $callService
+    ) {
 
         $files = $call->expertises->mapWithKeys(function ($expertise) {
             return $expertise->files->mapWithKeys(function ($file) use ($expertise) {
                 $involvedName = $expertise->person_type == ExpertisePersonType::Associate ? '' : $expertise->thirdParty->name ?? '';
                 $involvedPerson = $expertise->person_type ? $expertise->person_type->getLabel() : '';
 
-                return [$file->path => S3Service::filenameSanitizer($involvedPerson . '_' . $involvedName . '_' . $file->file_expertise_type->getLabel() . '_' . $file->id . '.' . pathinfo($file->path, PATHINFO_EXTENSION))];
+                return [$file->h => S3Service::filenameSanitizer($involvedPerson . '_' . $involvedName . '_' . $file->file_expertise_type->getLabel() . '_' . $file->id . '.' . pathinfo($file->path, PATHINFO_EXTENSION))];
             });
         })->toArray();
 
@@ -93,9 +95,9 @@ class CallController extends Controller
 
             Octane::concurrently($tasks, 20000);
 
-            $zipFile = CallService::createZipArchive($files, $tempDir, $call->id);
+            $zipFile = $callService->createZipArchive($files, $tempDir);
 
-            CallService::cleanupTempFiles($files, $tempDir);
+            $callService->cleanupTempFiles($files, $tempDir);
 
             return response()->download($zipFile)->deleteFileAfterSend(true);
         } catch (\Exception $e) {

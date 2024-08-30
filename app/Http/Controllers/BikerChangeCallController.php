@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BikerChangeCall;
-use App\Models\Call;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BikerChangeCallController extends Controller
 {
@@ -13,7 +12,7 @@ class BikerChangeCallController extends Controller
     {
 
         $bikerChangeCall = BikerChangeCall::where('call_id', $callId)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->first();
 
         if (!$bikerChangeCall) {

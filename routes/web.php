@@ -32,13 +32,11 @@ use Illuminate\Support\Facades\Response as Download;
 //     }
 // });
 
-// Route::get('/', function () {
-//     echo base_path() . '/firebase/fcm.json';
-// });
 
 //redirect to /admin
 Route::get('/', function () {
     return redirect('/admin');
 });
 
+Route::get('/acidente-pericia/{encryptedKey}', App\Livewire\AccidentExpertise::class)->name('accident-expertise');
 Route::get('/call/{call}/download', [CallController::class, 'download'])->name('call.download');

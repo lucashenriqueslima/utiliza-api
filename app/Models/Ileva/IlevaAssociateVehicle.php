@@ -63,7 +63,7 @@ class IlevaAssociateVehicle extends Model
             LEFT JOIN hbrd_main_util_city hmuc ON hmuc.id = hap.id_cidade
             LEFT JOIN hbrd_main_util_state hmus ON hmus.id = hmuc.id_estado
             WHERE hab.id in (118,122,130,174,234,181,123,119,31)
-            AND YEAR(hav.dt_contrato) >= 2024
+            AND hav.dt_contrato >= '2024-08-01';
             ");
     }
 }

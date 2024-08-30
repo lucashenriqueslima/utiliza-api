@@ -15,7 +15,7 @@ class MqttService
         $this->mqttClient = MQTT::connection();
     }
 
-    public function publish(string $topic, string $message, int $qos = 0, bool $retain = false): void
+    public function publish(string $topic, string $message, int $qos = 0, bool $retain = true): void
     {
         $this->mqttClient->publish($topic, $message, $qos, $retain);
     }
@@ -23,7 +23,7 @@ class MqttService
     public function registerLoopEvent(): void
     {
         $this->mqttClient->registerLoopEventHandler(function (MqttClient $mqttClient, float $elapsedTime) {
-            if ($elapsedTime > 20) {
+            if ($elapsedTime > 30) {
                 $mqttClient->interrupt();
             }
         });
@@ -31,7 +31,7 @@ class MqttService
 
     public function subscribe(string $topic, callable $callback): void
     {
-        $this->mqttClient->subscribe($topic, $callback, 2);
+        $this->mqttClient->subscribe($topic, $callback, 1);
     }
 
     public function unsubscribe(string $topic): void

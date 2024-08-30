@@ -10,6 +10,7 @@
         "cheesegrits/filament-google-maps": "^3.0",
         "filament/filament": "^3.2",
         "google/apiclient": "^2.15",
+        "jenssegers/mongodb": "*",
         "laravel/framework": "^11.0",
         "laravel/octane": "^2.3",
         "laravel/sanctum": "^4.0",
@@ -17,7 +18,10 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.28",
         "matanyadaev/laravel-eloquent-spatial": "^4.2",
-        "stechstudio/laravel-zipstream": "^5.0"
+        "mongodb/mongodb": "^1.19",
+        "php-mqtt/laravel-client": "^1.5",
+        "stechstudio/laravel-zipstream": "^5.0",
+        "webbingbrasil/filament-copyactions": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
