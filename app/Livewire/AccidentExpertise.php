@@ -71,6 +71,7 @@ class AccidentExpertise extends Component implements HasForms, HasActions
             ->default($this->accident->images->firstWhere('type', $accidentImageType)?->path)
             ->disabled($this->isInPreviewMode)
             ->downloadable($this->isInPreviewMode)
+            ->imagePreviewHeight('340')
             ->afterStateUpdated(
                 function (TemporaryUploadedFile $state) use ($accidentImageType) {
 
