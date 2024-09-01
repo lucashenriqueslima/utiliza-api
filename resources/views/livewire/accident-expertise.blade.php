@@ -26,7 +26,7 @@ $wire.on('redirect', () => {
 
     setTimeout(() => {
         window.location.href = 'https://www.aaprovel.com.br/'
-    }, 2000); // 2 seconds delay
+    }, 3000);
 
 })
 

@@ -12,6 +12,7 @@ use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Sleep;
 use Livewire\Component;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Actions\Contracts\HasActions;
@@ -98,7 +99,7 @@ class AccidentExpertise extends Component implements HasForms, HasActions
                     ]);
                 }
             )
-            ->required();
+        ->required();
     }
 
     public function getFieldsetComponent(string $label, array $accidentImageTypes): Fieldset
@@ -149,12 +150,13 @@ class AccidentExpertise extends Component implements HasForms, HasActions
                     Step::make('Documentos')
                         ->schema([
                             $this->getFileUploadComponent(AccidentImageType::Crlv),
-                            $this->getFileUploadComponent(AccidentImageType::Cnh),
-                        ]),
+                            $this->getFileUploadComponent(AccidentImageType::Cnh)
+                        ])
                 ])->submitAction(new HtmlString(Blade::render(<<<BLADE
                 <x-filament::button
                     type="submit"
                     size="md"
+                    form="submit"
                 >
                     Concluir
                 </x-filament::button>
@@ -165,12 +167,19 @@ class AccidentExpertise extends Component implements HasForms, HasActions
 
     public function submit(): void
     {
+
+        if ($this->isInPreviewMode) {
+            return;
+        }
+
+        $this->form->getState();
+
         Notification::make()
-            ->title('Formulário enviado com sucesso!')
-            ->body('Redirecionando para página Aaprovel...')
-            ->success()
-            ->persistent()
-            ->send();
+        ->title('Formulário enviado com sucesso!')
+        ->body('Redirecionando para página Aaprovel...')
+        ->success()
+        ->persistent()
+        ->send();
 
         $this->accident->update([
             'status' => AccidentStatus::Finished,
