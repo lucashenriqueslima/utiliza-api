@@ -100,7 +100,7 @@ class AccidentExpertise extends Component implements HasForms, HasActions
                     ]);
                 }
             )
-        ->required();
+            ->required();
     }
 
     public function getFieldsetComponent(string $label, array $accidentImageTypes): Fieldset
@@ -173,14 +173,14 @@ class AccidentExpertise extends Component implements HasForms, HasActions
             return;
         }
 
-        $this->form->getState();
+        // $this->form->getState();
 
         Notification::make()
-        ->title('Formulário enviado com sucesso!')
-        ->body('Redirecionando para página Aaprovel...')
-        ->success()
-        ->persistent()
-        ->send();
+            ->title('Formulário enviado com sucesso!')
+            ->body('Redirecionando para página Aaprovel...')
+            ->success()
+            ->persistent()
+            ->send();
 
         $this->accident->update([
             'status' => AccidentStatus::Finished,
