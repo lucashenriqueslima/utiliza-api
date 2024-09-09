@@ -24,6 +24,7 @@ use Filament\Forms\Components\Wizard;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Octane\Facades\Octane;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AccidentExpertise extends Component implements HasForms, HasActions
@@ -66,12 +67,15 @@ class AccidentExpertise extends Component implements HasForms, HasActions
     {
         return FileUpload::make($accidentImageType->value)
             ->label($accidentImageType->getLabel())
+            ->imagePreviewHeight('340')
+            ->imageResizeMode('contain')
             ->image()
             ->columnSpanFull()
+            ->directory('accidents')
+            ->visibility('public')
             ->default($this->accident->images->firstWhere('type', $accidentImageType)?->path)
             ->disabled($this->isInPreviewMode)
             ->downloadable($this->isInPreviewMode)
-            ->imagePreviewHeight('340')
             ->afterStateUpdated(
                 function (TemporaryUploadedFile $state) use ($accidentImageType) {
 
@@ -173,7 +177,24 @@ class AccidentExpertise extends Component implements HasForms, HasActions
             return;
         }
 
-        // $this->form->getState();
+        $data = $this->form->getState();
+
+
+        foreach ($data as $key => $value) {
+
+            $image = AccidentImage::where('accident_id', $this->accident->id)
+                ->where('type', $key)
+                ->where('is_current', true)
+                ->first();
+
+            if ($image) {
+                $image->update([
+                    'path' => $value,
+                ]);
+            }
+        }
+
+
 
         Notification::make()
             ->title('Formulário enviado com sucesso!')

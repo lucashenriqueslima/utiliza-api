@@ -123,7 +123,7 @@ class AccidentResource extends Resource
             ])
             ->bulkActions([])
             ->recordUrl(null)
-            ->poll('10s');
+            ->poll('60s');
     }
 
     public static function getRelations(): array
