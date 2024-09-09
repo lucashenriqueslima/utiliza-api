@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AccidentStatus;
 use App\Enums\VehicleType;
 use App\Filament\Resources\AccidentResource\Pages;
 use Webbingbrasil\FilamentCopyActions\Tables\Actions\CopyAction;
@@ -105,13 +106,19 @@ class AccidentResource extends Resource
                     Action::make('validate_expertise')
                         ->label('Acompanhar')
                         ->icon('heroicon-o-eye')
-                        ->color('success')
+                        ->color('info')
                         ->url(
                             fn(Accident $record): string => route('accident-expertise', [
                                 'encryptedKey' => Crypt::encrypt("{$record->plate}|{$record->created_at}|true")
                             ]),
                             shouldOpenInNewTab: true
                         ),
+                    Action::make('accident_download')
+                        ->label('Download')
+                        ->icon('heroicon-o-arrow-down-circle')
+                        ->color('success')
+                        ->url(fn(Accident $record): string => route('accident.download', $record->id), true)
+                        ->hidden(fn(Accident $record): bool => $record->status === AccidentStatus::Pending),
                 ])
             ])
             ->bulkActions([])
