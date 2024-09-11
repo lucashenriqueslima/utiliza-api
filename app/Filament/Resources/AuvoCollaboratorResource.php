@@ -42,7 +42,7 @@ class AuvoCollaboratorResource extends Resource
             ->schema([
                 Repeater::make('workshops')
                     ->label('Oficinas')
-                    ->addActionLabel('Adicionar aula')
+                    ->addActionLabel('Adicionar oficina')
                     ->relationship()
                     ->columnSpanFull()
                     ->columns(2)
