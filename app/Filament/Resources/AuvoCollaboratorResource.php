@@ -155,7 +155,8 @@ class AuvoCollaboratorResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Gerenciar visitas'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
