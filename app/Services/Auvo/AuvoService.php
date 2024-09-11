@@ -12,49 +12,12 @@ use Laravel\Octane\Facades\Octane;
 class AuvoService
 {
     private PendingRequest $authenticatedClient;
-    public string $accessToken;
 
-    public function __construct()
-    {
-        $this->accessToken = (new AuvoAuthService())->getAccessToken();
-
-        $this->authenticatedClient = Http::baseUrl(env('AUVO_API_URL'))
+    public function __construct(
+        private string $accessToken
+    ) {
+        $this->authenticatedClient = Http::baseUrl(config('auvo.api_url'))
             ->withHeaders($this->getHeaders());
-    }
-
-    public function getIlevaDatabaseCustomers(): array
-    {
-
-        return Octane::concurrently([
-            function () {
-                try {
-                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvoToSolidy();
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            },
-            function () {
-                try {
-                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvoToMotoclub();
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            },
-            function () {
-                try {
-                    return IlevaAccidentInvolved::getAccidentInvolvedForAuvoToNova();
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            },
-        ], 20000);
-    }
-
-    public function updateCustomers(array $customers, ?string $prefixExternalId = null): void
-    {
-        foreach ($customers as $customer) {
-            UpdateAuvoCustomerJob::dispatch($this->accessToken, $customer, $prefixExternalId);
-        }
     }
 
     private function getHeaders(): array
@@ -63,5 +26,21 @@ class AuvoService
             'Authorization' => 'Bearer ' . $this->accessToken,
             'Content-Type' => 'application/json',
         ];
+    }
+
+    public function getUsers(): array
+    {
+        try {
+            $response = $this->authenticatedClient
+                ->get('users', [
+                    'page' => 1,
+                    'pageSize' => 100,
+                    'order' => 'asc',
+                ]);
+
+            return $response->json()['result']['entityList'];
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }

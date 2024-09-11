@@ -62,6 +62,28 @@ class CallResource extends Resource
                         ->required(fn(Get $get) => (!$get('temp_associate_id')))
                         ->disabled(fn(Get $get) => ($get('temp_associate_id')))
                         ->live()
+                        ->getSearchResultsUsing(
+                            fn(string $search): array =>
+
+
+                            IlevaAssociate::select('hbrd_asc_associado.id', 'hbrd_asc_pessoa.nome')
+                                ->selectSub(function ($query) {
+                                    $query->selectRaw('datediff(now(), ifnull(min(hbrd_finan_boleto.dt_vencimento), now()))')
+                                        ->from('hbrd_finan_boleto')
+                                        ->whereColumn('hbrd_finan_boleto.id_pessoa', 'hbrd_asc_pessoa.id')
+                                        ->where('situacao', 'Aberto')
+                                        ->where('hbrd_finan_boleto.dt_vencimento', '<', now())
+                                        ->groupBy('hbrd_finan_boleto.id_pessoa');
+                                }, 'days_without_payment')
+                                ->join('hbrd_asc_pessoa', 'hbrd_asc_associado.id_pessoa', '=', 'hbrd_asc_pessoa.id')
+                                ->orderBy('hbrd_asc_pessoa.nome')
+                                ->where('hbrd_asc_pessoa.nome', 'like', "%" . $search . "%")
+                                ->limit(50)
+                                ->get()
+                                ->mapWithKeys(fn($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? '0') . ' dia(s) de atraso'])
+                                ->toArray()
+                        )
+                        ->getOptionLabelUsing(fn($value) => IlevaAssociate::find($value)->person->nome ?? $value)
                         ->createOptionForm([
                             Section::make('Associado')
                                 ->description('Caso o associado não esteja cadastrado, preencha os campos abaixo para criar um novo.')
@@ -130,29 +152,7 @@ class CallResource extends Resource
                                 ->send();
 
                             return 'Associado Criado';
-                        })
-                        ->getSearchResultsUsing(
-                            fn(string $search): array =>
-
-
-                            IlevaAssociate::select('hbrd_asc_associado.id', 'hbrd_asc_pessoa.nome')
-                                ->selectSub(function ($query) {
-                                    $query->selectRaw('datediff(now(), ifnull(min(hbrd_finan_boleto.dt_vencimento), now()))')
-                                        ->from('hbrd_finan_boleto')
-                                        ->whereColumn('hbrd_finan_boleto.id_pessoa', 'hbrd_asc_pessoa.id')
-                                        ->where('situacao', 'Aberto')
-                                        ->where('hbrd_finan_boleto.dt_vencimento', '<', now())
-                                        ->groupBy('hbrd_finan_boleto.id_pessoa');
-                                }, 'days_without_payment')
-                                ->join('hbrd_asc_pessoa', 'hbrd_asc_associado.id_pessoa', '=', 'hbrd_asc_pessoa.id')
-                                ->orderBy('hbrd_asc_pessoa.nome')
-                                ->where('hbrd_asc_pessoa.nome', 'like', "%" . $search . "%")
-                                ->limit(50)
-                                ->get()
-                                ->mapWithKeys(fn($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? '0') . ' dia(s) de atraso'])
-                                ->toArray()
-                        )
-                        ->getOptionLabelUsing(fn($value) => IlevaAssociate::find($value)->person->nome ?? $value),
+                        }),
                     Select::make('associate_vehicle_id')
                         ->label('Veículo')
                         ->placeholder('Selecione um veículo')

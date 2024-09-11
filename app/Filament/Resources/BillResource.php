@@ -82,7 +82,7 @@ class BillResource extends Resource
                             ->label('Valor')
                             ->mask('99,99')
                             ->prefix('R$')
-                            ->default(fn (): string => (new CallValue())->getValidValueAttribute()),
+                            ->default(fn(): string => (new CallValue())->getValidValueAttribute()),
                     ])
                     ->action(function (array $data): void {
 
@@ -117,7 +117,7 @@ class BillResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->url(
-                        fn (Bill $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->call->biker->phone), "Olá {$record->call->biker->name}"),
+                        fn(Bill $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->call->biker->phone), "Olá {$record->call->biker->name}"),
                         shouldOpenInNewTab: true
                     ),
                 TextColumn::make('value')
@@ -153,7 +153,7 @@ class BillResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->action(fn (Collection $records) => $records->each(fn (Bill $record) => $record->update(['status' => BillStatus::Paid->value]))),
+                    ->action(fn(Collection $records) => $records->each(fn(Bill $record) => $record->update(['status' => BillStatus::Paid->value]))),
             ]);
     }
 
@@ -168,8 +168,6 @@ class BillResource extends Resource
     {
         return [
             'index' => Pages\ListBills::route('/'),
-            // 'create' => Pages\CreateBill::route('/create'),
-            // 'edit' => Pages\EditBill::route('/{record}/edit'),
         ];
     }
 }
