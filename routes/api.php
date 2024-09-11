@@ -15,15 +15,24 @@ use App\Http\Controllers\Api\V1\ExpertiseController;
 use App\Http\Controllers\Api\V1\ExpertiseFileValidationErrorController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
 use App\Http\Controllers\BikerChangeCallController;
+use App\Models\AuvoWorkshop;
+use Illuminate\Support\Collection;
 
 Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
+Route::prefix('auvo')->group(function () {
+    Route::get('/workshops', function (): Collection {
+        return AuvoWorkshop::select('id', 'ileva_id', 'visit_time', 'days_of_week')
+            ->with('collaborator:id')
+            ->get();
+    });
+});
+
 Route::prefix('v1')->group(function () {
 
-    Route::get('/ping', function () {
-    });
+    Route::get('/ping', function () {});
 
     Route::prefix('auth')->group(function () {
 
