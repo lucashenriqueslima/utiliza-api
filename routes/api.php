@@ -25,7 +25,7 @@ Route::get('/', function () {
 Route::prefix('auvo')->group(function () {
     Route::get('/workshops', function (): Collection {
         return AuvoWorkshop::select('id', 'auvo_collaborator_id', 'ileva_id', 'visit_time', 'days_of_week')
-            ->with('collaborator:id')
+            ->with('collaborator:id,auvo_id')
             ->get();
     });
 });
