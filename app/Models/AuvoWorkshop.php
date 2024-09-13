@@ -18,6 +18,6 @@ class AuvoWorkshop extends Model
 
     public function collaborator(): BelongsTo
     {
-        return $this->belongsTo(AuvoCollaborator::class);
+        return $this->belongsTo(AuvoCollaborator::class, 'auvo_collaborator_id');
     }
 }
