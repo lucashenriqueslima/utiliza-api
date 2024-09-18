@@ -312,7 +312,6 @@ class CallResource extends Resource
                             ]
                         );
 
-
                         $distance = number_format($rawDistance[0]->distance / 1000, 1);
 
 
@@ -336,12 +335,10 @@ class CallResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('validated_by')
                     ->label('Validado(s) por:')
-                    ->searchable()
-                    ->sortable()
                     ->getStateUsing(function ($record) {
                         return $record->whereHas('expertises', function ($query) {
                             $query->where('status', ExpertiseStatus::Done);
-                        })->with('expertises.user')->get()->pluck('expertises')
+                        })->with('expertises.user')?->get()->pluck('expertises')
                             ->flatten()
                             ->pluck('user')
                             ->pluck('name')

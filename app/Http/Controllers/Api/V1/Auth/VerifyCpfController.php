@@ -22,25 +22,29 @@ class VerifyCpfController extends Controller
 
         try {
             $locavibeRenter = LocavibeRenter::where('cpf', $request->cpf)->firstOrFail();
+
+            $authToken = AuthService::generateAuthenticationToken();
+
+            SendAuthenticationTokenJob::dispatch($locavibeRenter, $authToken);
+
+            $locavibeRenter->authToken = $authToken;
+            $locavibeRenter->authTokenVerified = false;
+
+            $locavibeRenter->save();
+
+            $maskedEmail = AuthService::maskEmail($locavibeRenter->email);
+
+            return response()->json([
+                'masked_email' => $maskedEmail
+            ]);
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'CPF não encontrado'
+                'message' => 'CPF'
             ], 404);
+        } catch (\Exception) {
+            return response()->json([
+                'message' => 'Erro ao gerar token de autenticação'
+            ], 500);
         }
-
-        $authToken = AuthService::generateAuthenticationToken();
-
-        SendAuthenticationTokenJob::dispatch($locavibeRenter, $authToken);
-
-        $locavibeRenter->authToken = $authToken;
-        $locavibeRenter->authTokenVerified = false;
-
-        $locavibeRenter->save();
-
-        $maskedEmail = AuthService::maskEmail($locavibeRenter->email);
-
-        return response()->json([
-            'masked_email' => $maskedEmail
-        ]);
     }
 }

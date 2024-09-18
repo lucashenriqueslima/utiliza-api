@@ -39,73 +39,6 @@ class StartMqttClientCommand extends Command implements Isolatable
      */
     protected $description = 'Start MQTT client';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(
-        MqttService $mqttService,
-        BikerGeolocationService $bikerGeolocationService,
-        ExpertiseFileValidationErrorService $expertiseFileValidationErrorService,
-        BikerChangeCallService $bikerChangeCallService
-    ): void {
-
-        try {
-
-            // $base_url = 'ady4g3wrobmle-ats.iot.sa-east-1.amazonaws.com';
-            // $mqtt = new MqttClient(
-            //     $base_url,
-            //     8883,
-            //     NULL,
-            //     MqttClient::MQTT_3_1_1
-            // );
-            // $connectionSettings = (new ConnectionSettings())
-            //     ->setConnectTimeout(3)
-            //     ->setUseTls(TRUE)
-            //     // Download root cert from https://docs.aws.amazon.com/iot/latest/developerguide/server-authentication.html
-            //     ->setTlsCertificateAuthorityFile('/var/www/html/docker/8.3/aws-mqtt-ca1.pem')
-            //     // @see https://docs.aws.amazon.com/iot/latest/developerguide/fleet-provision-api.html#create-keys-cert
-            //     ->setTlsClientCertificateKeyFile('/var/www/html/docker/8.3/aws-mqtt-private.pem.key')
-            //     ->setTlsClientCertificateFile('/var/www/html/docker/8.3/aws-mqtt-certificate.pem.crt');
-            // $mqtt->connect($connectionSettings);
-
-            // $mqtt->subscribe(
-            //     'biker/+/geolocation',
-            //     function ($topic, $message, $retained, $matchedWildcards) use ($mqtt) {
-            //         $payload = json_decode($message);
-            //         echo sprintf("Received message on topic [%s]: %s\n", $topic, $message);
-            //         $mqtt->interrupt();
-            //         $mqtt->disconnect();
-            //     }
-            // );
-
-            // $mqtt->loop(TRUE);
-
-            $this->oldPublishes = json_decode($this->argument('oldPublishes'), true);
-
-            $this->newPublishes = $this->getNewPublishes(
-                $expertiseFileValidationErrorService,
-                $bikerChangeCallService
-            );
-
-            $this->handleSubscriptions($mqttService, $bikerGeolocationService);
-
-            $mqttService->registerLoopEvent();
-
-            Log::info(sprintf("New publishes: %s", json_encode($this->newPublishes)));
-
-            $this->handlePublishes($mqttService, $this->newPublishes, $this->oldPublishes);
-
-            $mqttService->loop();
-
-            Artisan::call('mqtt:start', [
-                'oldPublishes' => json_encode($this->newPublishes)
-            ]);
-        } catch (MqttClientException $e) {
-            $this->fail($e->getMessage());
-        }
-    }
-
-
     private function handleSubscriptions(MqttService $mqttService, BikerGeolocationService $bikerGeolocationService): void
     {
         $mqttService->subscribe('biker/+/geolocation', function (string $topic, string $message) use ($mqttService, $bikerGeolocationService): void {
@@ -115,6 +48,10 @@ class StartMqttClientCommand extends Command implements Isolatable
             $decodedJson = json_decode($message, true);
             $bikerId = explode('/', $topic)[1];
 
+            if (!$this->geolocationIsValid($decodedJson)) {
+                Log::error(sprintf("Invalid geolocation received: %s", $message));
+                return;
+            }
 
             $bikerGeolocationService->update(
                 $bikerId,
@@ -166,5 +103,48 @@ class StartMqttClientCommand extends Command implements Isolatable
     private function udiffCompare($a, $b): int
     {
         return $a['topic'] <=> $b['topic'];
+    }
+
+    private function geolocationIsValid(array $geolocation): bool
+    {
+        return $geolocation['latitude'] >= -90.000000 && $geolocation['latitude'] <= 90.000000
+            && $geolocation['longitude'] >= -90.000000 && $geolocation['longitude'] <= 90.000000;
+    }
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(
+        MqttService $mqttService,
+        BikerGeolocationService $bikerGeolocationService,
+        ExpertiseFileValidationErrorService $expertiseFileValidationErrorService,
+        BikerChangeCallService $bikerChangeCallService
+    ): void {
+
+        try {
+
+            $this->oldPublishes = json_decode($this->argument('oldPublishes'), true);
+
+            $this->newPublishes = $this->getNewPublishes(
+                $expertiseFileValidationErrorService,
+                $bikerChangeCallService
+            );
+
+            $this->handleSubscriptions($mqttService, $bikerGeolocationService);
+
+            $mqttService->registerLoopEvent();
+
+            Log::info(sprintf("New publishes: %s", json_encode($this->newPublishes)));
+
+            $this->handlePublishes($mqttService, $this->newPublishes, $this->oldPublishes);
+
+            $mqttService->loop();
+
+            Artisan::call('mqtt:start', [
+                'oldPublishes' => json_encode($this->newPublishes)
+            ]);
+        } catch (MqttClientException $e) {
+            $this->fail($e->getMessage());
+        }
     }
 }
