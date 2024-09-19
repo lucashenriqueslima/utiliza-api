@@ -39,7 +39,7 @@ class VerifyCpfController extends Controller
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'CPF'
+                'message' => 'CPF não encontrado'
             ], 404);
         } catch (\Exception) {
             return response()->json([
