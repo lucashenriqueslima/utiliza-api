@@ -22,7 +22,8 @@ class CallObserver
      */
     public function created(Call $call): void
     {
-        StartLookingForBikerToCallJob::dispatch($call);
+        // StartLookingForBikerToCallJob::dispatch($call);
+        dispatch(new StartLookingForBikerToCallJob($call));
     }
 
     /**

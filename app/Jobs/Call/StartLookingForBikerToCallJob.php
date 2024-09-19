@@ -48,15 +48,15 @@ class StartLookingForBikerToCallJob implements ShouldQueue
         Log::info('Blocked users: ' . $blockedUserIds->toJson());
 
         $this->bikers = Biker::selectRaw(
-            '
-        bikers.id,
-        ST_Distance_Sphere(POINT(?, ?), biker_geolocations.location) AS distance',
+            'bikers.id,
+            ST_Distance_Sphere(POINT(?, ?), biker_geolocations.location) AS distance',
             [
                 $this->call->location->longitude,
                 $this->call->location->latitude
             ]
         )
             ->join('biker_geolocations', 'bikers.id', '=', 'biker_geolocations.biker_id')
+            ->whereNotNull('biker_geolocations.location')
             ->where('bikers.status', BikerStatus::Avaible->value)
             ->whereNotIn('bikers.id', $blockedUserIds)
             ->orderBy('distance')
