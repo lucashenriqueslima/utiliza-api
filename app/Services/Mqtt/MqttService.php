@@ -23,7 +23,7 @@ class MqttService
     public function registerLoopEvent(): void
     {
         $this->mqttClient->registerLoopEventHandler(function (MqttClient $mqttClient, float $elapsedTime) {
-            if ($elapsedTime > 30) {
+            if ($elapsedTime > 20) {
                 $mqttClient->interrupt();
             }
         });

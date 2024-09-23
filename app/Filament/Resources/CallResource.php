@@ -33,17 +33,12 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Support\Facades\Auth;
 
-
-use function PHPSTORM_META\map;
-
 class CallResource extends Resource
 {
     protected static ?string $model = Call::class;
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
     protected static ?string $modelLabel = 'Chamado';
     protected static ?int $navigationSort = 1;
-
-
 
     public static function form(Form $form): Form
     {

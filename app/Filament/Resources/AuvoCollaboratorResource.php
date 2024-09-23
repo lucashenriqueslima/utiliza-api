@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AssociationEnum;
 use App\Enums\AuvoDepartment;
 use App\Filament\Resources\AuvoCollaboratorResource\Pages;
 use App\Filament\Resources\AuvoCollaboratorResource\RelationManagers;
@@ -47,6 +48,12 @@ class AuvoCollaboratorResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
+                        Select::make('association')
+                            ->label('Associação')
+                            ->placeholder('Selecione uma associação')
+                            ->options(AssociationEnum::class)
+                            ->columnSpanFull(),
+
                         Select::make('ileva_id')
                             ->label('Oficina')
                             ->placeholder('Selecione um associado')

@@ -69,10 +69,10 @@ class StartMqttClientCommand extends Command implements Isolatable
         array $oldPublishes
     ): void {
 
-        $newPublishesToPublish = array_udiff($newPublishes, $oldPublishes, [$this, 'udiffCompare']);
+        // $newPublishesToPublish = array_udiff($newPublishes, $oldPublishes, [$this, 'udiffCompare']);
 
 
-        foreach ($newPublishesToPublish as $publish) {
+        foreach ($newPublishes as $publish) {
             $mqttService->publish($publish['topic'], $publish['message']);
             Log::info(sprintf("Published message on topic [%s]: %s", $publish['topic'], $publish['message']));
         }
