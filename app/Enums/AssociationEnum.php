@@ -18,9 +18,9 @@ enum AssociationEnum: string implements HasLabel
     public function getDatabaseConnection(): string
     {
         return match ($this) {
-            self::Solidy => config('database.ileva'),
-            self::Nova => config('database.ileva_nova'),
-            self::Motoclub => config('database.ileva_motoclub'),
+            self::Solidy => 'ileva',
+            self::Nova => 'ileva_nova',
+            self::Motoclub => 'ileva_motoclub',
         };
     }
 }

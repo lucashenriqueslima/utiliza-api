@@ -11,6 +11,7 @@ use App\Models\AuvoWorkshop;
 use App\Models\Ileva\IlevaWorkshop;
 use App\Services\Auvo\AuvoAuthService;
 use App\Services\Auvo\AuvoService;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
@@ -20,9 +21,10 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
 use Laravel\Octane\Facades\Octane;
-use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Illuminate\Support\Facades\DB;
 
 class AuvoCollaboratorResource extends Resource
 {
@@ -52,6 +54,7 @@ class AuvoCollaboratorResource extends Resource
                             ->label('Associação')
                             ->placeholder('Selecione uma associação')
                             ->options(AssociationEnum::class)
+                            ->live()
                             ->columnSpanFull(),
 
                         Select::make('ileva_id')
@@ -62,15 +65,22 @@ class AuvoCollaboratorResource extends Resource
                             ->searchDebounce(300)
                             ->required()
                             ->live(onBlur: true)
+                            ->disabled(fn(Get $get) => !$get('association'))
                             ->getSearchResultsUsing(
-                                function (string $search): array {
-                                    return IlevaWorkshop::select('id', 'nome', 'cnpj')
-                                        ->where(fn($query) => $query->where('nome', 'like', "%{$search}%")
-                                            ->orWhere('cnpj', 'like', "%{$search}%"))
+                                function (string $search, Get $get): array {
+
+                                    $association = AssociationEnum::from($get('association'));
+
+                                    return DB::connection($association->getDatabaseConnection())->table('hbrd_adm_store')
+                                        ->select('id', 'nome', 'cnpj')
+                                        ->where(function ($query) use ($search) {
+                                            $query->where('nome', 'like', "%{$search}%")
+                                                ->orWhere('cnpj', 'like', "%{$search}%");
+                                        })
                                         ->orderBy('nome')
                                         ->limit(30)
                                         ->get()
-                                        ->map(fn(IlevaWorkshop $workshop) => [(int) $workshop->id => "{$workshop->nome} - {$workshop->cnpj}"])
+                                        ->map(fn($workshop) => [(int) $workshop->id => "{$workshop->nome} - {$workshop->cnpj}"])
                                         ->toArray();
                                 }
                             ),
@@ -96,7 +106,15 @@ class AuvoCollaboratorResource extends Resource
 
 
                     ])
-                    ->itemLabel(fn(array $state): ?string => IlevaWorkshop::find($state['ileva_id'])?->nome),
+                    ->itemLabel(function (array $state): ?string {
+
+                        if (!$state['association']) {
+                            return null;
+                        }
+
+                        $association = AssociationEnum::from($state['association']);
+                        return DB::connection($association->getDatabaseConnection())->table('hbrd_adm_store')->find($state['ileva_id'])?->nome;
+                    }),
 
             ]);
     }
