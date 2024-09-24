@@ -26,6 +26,12 @@ class BikerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -37,6 +43,7 @@ class BikerResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
@@ -63,7 +70,7 @@ class BikerResource extends Resource
                         ->icon('heroicon-o-map-pin')
                         ->color('info')
                         ->visible(fn(Biker $record): bool => $record->geolocation !== null)
-                        ->url(fn(Biker $record): string => LinkGeneratorHelper::googleMaps($record->geolocation?->location?->longitude ?? '', $record->geolocation?->location?->latitude ?? ''), true),
+                        ->url(fn(Biker $record): string => LinkGeneratorHelper::googleMaps($record?->geolocation?->location?->longitude, $record?->geolocation?->location?->latitude), true),
                 ]),
             ])
             ->bulkActions([
@@ -84,8 +91,6 @@ class BikerResource extends Resource
     {
         return [
             'index' => Pages\ListBikers::route('/'),
-            'create' => Pages\CreateBiker::route('/create'),
-            'edit' => Pages\EditBiker::route('/{record}/edit'),
         ];
     }
 }

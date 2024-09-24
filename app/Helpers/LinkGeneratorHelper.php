@@ -6,7 +6,7 @@ class LinkGeneratorHelper
 {
     public static function googleMaps(?string $longitude, ?string $latitude): string
     {
-        if ($longitude || $latitude) {
+        if (!$longitude || !$latitude) {
             return '';
         }
 
