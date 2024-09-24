@@ -6,6 +6,10 @@ class LinkGeneratorHelper
 {
     public static function googleMaps(string $longitude, string $latitude): string
     {
+        if (empty($longitude) || empty($latitude)) {
+            return '';
+        }
+
         return "https://www.google.com/maps?q={$longitude},{$latitude}&z=17&hl=pt-BR";
     }
 

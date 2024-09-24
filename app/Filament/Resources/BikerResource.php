@@ -63,7 +63,7 @@ class BikerResource extends Resource
                         ->icon('heroicon-o-map-pin')
                         ->color('info')
                         ->visible(fn(Biker $record): bool => $record->geolocation !== null)
-                        ->url(fn(Biker $record): string => LinkGeneratorHelper::googleMaps($record->geolocation?->location?->longitude, $record->geolocation?->location?->latitude), true),
+                        ->url(fn(Biker $record): string => LinkGeneratorHelper::googleMaps($record->geolocation?->location?->longitude ?? '', $record->geolocation?->location?->latitude ?? ''), true),
                 ]),
             ])
             ->bulkActions([
