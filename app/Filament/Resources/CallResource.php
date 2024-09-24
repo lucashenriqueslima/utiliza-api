@@ -392,6 +392,12 @@ class CallResource extends Resource
                                 ->send();
                         })
                         ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
+                    Action::make('locate_biker')
+                        ->label('Localizar Motoboy')
+                        ->icon('heroicon-o-map-pin')
+                        ->color('info')
+                        ->visible(fn(Call $record): bool => $record?->biker?->geolocation !== null)
+                        ->url(fn(Call $record): string => LinkGeneratorHelper::googleMaps($record->biker->geolocation->location->longitude, $record->biker->geolocation->location->latitude), true),
                     Action::make('validate_expertise')
                         ->label('Validar')
                         ->icon('heroicon-o-eye')
@@ -403,7 +409,7 @@ class CallResource extends Resource
                         ->icon('heroicon-o-arrow-down-circle')
                         ->color('success')
                         ->url(fn(Call $record): string => route('call.download', $record->id), true)
-                        ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::Approved]))
+                        ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::Approved])),
                 ])
             ])
             ->bulkActions([])

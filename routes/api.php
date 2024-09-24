@@ -32,8 +32,6 @@ Route::prefix('auvo')->group(function () {
 
 Route::prefix('v1')->group(function () {
 
-    Route::get('/ping', function () {});
-
     Route::prefix('auth')->group(function () {
 
         Route::post('/verify-cpf', [VerifyCpfController::class, 'store']);

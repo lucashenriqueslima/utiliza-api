@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\BikerStatus;
+use Database\Seeders\BikerSeeder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -15,6 +17,13 @@ class Biker extends Authenticatable
 
     protected $guarded = [];
 
+
+    protected function casts(): array
+    {
+        return [
+            'status' => BikerStatus::class,
+        ];
+    }
 
     public function bikerChangeCalls(): HasMany
     {
