@@ -4,9 +4,9 @@ namespace App\Helpers;
 
 class LinkGeneratorHelper
 {
-    public static function googleMaps(string $longitude, string $latitude): string
+    public static function googleMaps(?string $longitude, ?string $latitude): string
     {
-        if (empty($longitude) || empty($latitude)) {
+        if ($longitude || $latitude) {
             return '';
         }
 

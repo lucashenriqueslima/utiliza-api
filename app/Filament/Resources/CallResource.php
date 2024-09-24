@@ -397,7 +397,7 @@ class CallResource extends Resource
                         ->icon('heroicon-o-map-pin')
                         ->color('info')
                         ->visible(fn(Call $record): bool => $record?->biker?->geolocation !== null)
-                        ->url(fn(Call $record): string => LinkGeneratorHelper::googleMaps($record->biker->geolocation->location->longitude, $record->biker->geolocation->location->latitude), true),
+                        ->url(fn(Call $record): string => LinkGeneratorHelper::googleMaps($record?->biker?->geolocation?->location?->longitude, $record?->biker?->geolocation?->location?->latitude), true),
                     Action::make('validate_expertise')
                         ->label('Validar')
                         ->icon('heroicon-o-eye')
