@@ -15,7 +15,7 @@ class BikerGeolocationService
         DB::statement(
             "UPDATE biker_geolocations
         SET biker_geolocations.location = POINT(?, ?),
-        biker_geolocations.updated_at = DATE_ADD(NOW(), INTERVAL 3 HOUR)
+        biker_geolocations.updated_at = DATE_SUB(NOW(), INTERVAL 3 HOUR)
         where biker_geolocations.biker_id = ?",
             [
                 $latitude,

@@ -59,6 +59,9 @@ class BikerResource extends Resource
                 TextColumn::make('status')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('geolocation.updated_at')
+                    ->label('Última Atualização')
+                    ->since(),
             ])
             ->filters([
                 //
