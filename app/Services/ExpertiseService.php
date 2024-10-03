@@ -36,8 +36,12 @@ class ExpertiseService
             self::uploadFile($request->video, $expertise, $s3service);
         }
 
-        foreach ($request->images as $image) {
-            self::uploadFile($image, $expertise, $s3service);
+
+
+        if (!empty($request->images)) {
+            foreach ($request->images as $image) {
+                self::uploadFile($image, $expertise, $s3service);
+            }
         }
     }
 
