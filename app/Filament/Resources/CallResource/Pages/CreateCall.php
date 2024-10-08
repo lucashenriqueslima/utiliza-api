@@ -29,7 +29,8 @@ class CreateCall extends CreateRecord
                 'associate_car_id' => $data['temp_associate_car_id'] ?? $carId,
                 'address' => $data['address'],
                 'location' => new Point(floatval($data['location']['lng']), floatval($data['location']['lat'])),
-                'observation' => $data['observation']
+                'observation' => $data['observation'],
+                'association' => $data['association'],
             ]
         );
     }

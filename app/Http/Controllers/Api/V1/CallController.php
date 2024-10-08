@@ -3,18 +3,21 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseFileValidationErrorStatus;
 use App\Enums\ExpertisePersonType;
 use App\Enums\ExpertiseStatus;
 use App\Enums\ExpertiseType;
 use App\Http\Controllers\Controller;
 use App\Models\Call;
 use App\Models\Expertise;
+use App\Models\ExpertiseFileValidationError;
 use App\Services\CallService;
 use App\Services\S3\S3Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Octane\Facades\Octane;
+use ZipArchive;
 
 class CallController extends Controller
 {
@@ -54,20 +57,17 @@ class CallController extends Controller
             ]);
     }
 
-    public function download(
-        Call $call,
-        CallService $callService
-    ) {
+    public function download(Call $call)
+    {
 
         $files = $call->expertises->mapWithKeys(function ($expertise) {
             return $expertise->files->mapWithKeys(function ($file) use ($expertise) {
                 $involvedName = $expertise->person_type == ExpertisePersonType::Associate ? '' : $expertise->thirdParty->name ?? '';
                 $involvedPerson = $expertise->person_type ? $expertise->person_type->getLabel() : '';
 
-                return [$file->h => S3Service::filenameSanitizer($involvedPerson . '_' . $involvedName . '_' . $file->file_expertise_type->getLabel() . '_' . $file->id . '.' . pathinfo($file->path, PATHINFO_EXTENSION))];
+                return [$file->path => S3Service::filenameSanitizer($involvedPerson . '_' . $involvedName . '_' . $file->file_expertise_type->getLabel() . '_' . $file->id . '.' . pathinfo($file->path, PATHINFO_EXTENSION))];
             });
         })->toArray();
-
 
         $tempDir = storage_path('app/temp');
         if (!file_exists($tempDir)) {
@@ -92,13 +92,45 @@ class CallController extends Controller
 
             Octane::concurrently($tasks, 20000);
 
-            $zipFile = $callService->createZipArchive($files, $tempDir);
+            $zipFile = self::createZipArchive($files, $tempDir, $call->id);
 
-            $callService->cleanupTempFiles($files, $tempDir);
+            self::cleanupTempFiles($files, $tempDir);
 
             return response()->download($zipFile)->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao processar o download: ' . $e->getMessage()], 500);
         }
+    }
+
+    public static function cleanupTempFiles($files, $tempDir)
+    {
+        foreach ($files as $localFilename) {
+            unlink($tempDir . '/' . $localFilename);
+        }
+        rmdir($tempDir);
+    }
+
+
+    public static function createZipArchive($files, $tempDir)
+    {
+        $zip = new ZipArchive();
+        $zipFile = storage_path('app/public/chamado.zip');
+
+        if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+
+            foreach ($files as $localFilename) {
+                try {
+                    $zip->addFile($tempDir . '/' . $localFilename, $localFilename);
+                } catch (\Exception $e) {
+                    dd($e);
+                    throw new \Exception('Erro ao adicionar arquivo ao ZIP: ' . $e->getMessage());
+                }
+            }
+            $zip->close();
+        } else {
+            throw new \Exception('Não foi possível criar o arquivo ZIP');
+        }
+
+        return $zipFile;
     }
 }

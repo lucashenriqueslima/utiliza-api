@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AssociationEnum;
 use App\Enums\CallStatus;
 use App\Enums\ExpertiseStatus;
 use App\Filament\Pages\ValidateExpertise;
@@ -49,6 +50,13 @@ class CallResource extends Resource
                 Hidden::make('temp_associate_car_id')
                     ->live(),
                 Section::make()->columns(2)->schema([
+                    Select::make('association')
+                        ->label('Associação')
+                        ->options(
+                            AssociationEnum::getLabelsToCallResource()
+                        )
+                        ->columnSpanFull()
+                        ->required(),
                     Select::make('associate_id')
                         ->label('Associado')
                         ->placeholder('Selecione um associado')
@@ -243,6 +251,10 @@ class CallResource extends Resource
                     ->label('Cód.')
                     ->searchable()
                     ->configure()
+                    ->sortable(),
+                TextColumn::make('association')
+                    ->label('Associação')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('associateCar.associate.name')
                     ->label('Associado')

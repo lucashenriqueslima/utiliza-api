@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AssociationEnum;
 use App\Enums\CallStatus;
 use App\Models\Ileva\IlevaAssociateVehicle;
 use App\Observers\CallObserver;
@@ -25,6 +26,7 @@ class Call extends Model
     {
         return [
             'status' => CallStatus::class,
+            'association' => AssociationEnum::class,
             'location' => Point::class,
         ];
     }
