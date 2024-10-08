@@ -36,8 +36,11 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $firebaseService = new FirebaseService((new FirebaseAuthService())->getAccessToken());
-
+        try {
+            $firebaseService = new FirebaseService((new FirebaseAuthService())->getAccessToken());
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
         $biker = $this->bikers->shift();
         $this->distances;
 

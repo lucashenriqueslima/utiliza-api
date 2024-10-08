@@ -20,7 +20,7 @@ class FirebaseService
     public function __construct(
         private string $acessToken,
     ) {
-        $this->pushNotificationUri = "https://fcm.googleapis.com/v1/projects/" . env('FIREBASE_APP_ID') . "/messages:send";
+        $this->pushNotificationUri = "https://fcm.googleapis.com/v1/projects/" . config('firebase.app_id') . "/messages:send";
         $this->client = Http::withHeaders($this->getHeaders());
     }
 
