@@ -60,6 +60,7 @@ class StartLookingForBikerToCallJob implements ShouldQueue
             ->where('bikers.status', BikerStatus::Avaible->value)
             ->whereNotNull('biker_geolocations.location')
             ->whereNotIn('bikers.id', $blockedUserIds)
+            ->whereIn('bikers.id', [5, 13])
             ->orderBy('distance')
             ->get();
 
