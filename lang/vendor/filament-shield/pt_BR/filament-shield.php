@@ -31,7 +31,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'nav.group' => 'Filament Shield',
+    'nav.group' => 'Permissões',
     'nav.role.label' => 'Funções',
     'nav.role.icon' => 'heroicon-o-shield-check',
     'resource.label.role' => 'Função',
@@ -62,18 +62,19 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    // 'resource_permission_prefixes_labels' => [
-    //     'view' => 'View',
-    //     'view_any' => 'View Any',
-    //     'create' => 'Create',
-    //     'update' => 'Update',
-    //     'delete' => 'Delete',
-    //     'delete_any' => 'Delete Any',
-    //     'force_delete' => 'Force Delete',
-    //     'force_delete_any' => 'Force Delete Any',
-    //     'restore' => 'Restore',
-    //     'reorder' => 'Reorder',
-    //     'restore_any' => 'Restore Any',
-    //     'replicate' => 'Replicate',
-    // ],
+    'resource_permission_prefixes_labels' => [
+        'view' => 'Ver',
+        'view_any' => 'Ver Qualquer',
+        'create' => 'Criar',
+        'update' => 'Atualizar',
+        'delete' => 'Deletar',
+        'delete_any' => 'Deletar Qualquer',
+        'force_delete' => 'Deletar Permanentemente',
+        'force_delete_any' => 'Deletar Permanentemente Qualquer',
+        'restore' => 'Restaurar',
+        'reorder' => 'Reordenar',
+        'restore_any' => 'Restaurar Qualquer',
+        'replicate' => 'Replicar',
+        'update_responsable' => 'Atualizar Responsável',
+    ],
 ];

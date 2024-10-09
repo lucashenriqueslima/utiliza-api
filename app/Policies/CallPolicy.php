@@ -42,6 +42,11 @@ class CallPolicy
         return $user->can('update_call');
     }
 
+    public function updateResponsable(User $user): bool
+    {
+        return $user->can('update_responsable_call');
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

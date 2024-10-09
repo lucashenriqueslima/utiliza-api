@@ -86,6 +86,11 @@ class Call extends Model
         return $this->hasMany(CallRequest::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function validationErrors(): HasMany
     {
         return $this->hasMany(ExpertiseFileValidationError::class);

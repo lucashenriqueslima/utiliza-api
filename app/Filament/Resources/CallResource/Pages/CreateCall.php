@@ -7,10 +7,10 @@ use App\Jobs\Call\FindBikerForCallJob;
 use App\Jobs\Call\StartLookingForBikerToCallJob;
 use App\Models\Associate;
 use App\Models\Ileva\IlevaAssociate;
-use App\Services\Firebase\FirebaseAuthService;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class CreateCall extends CreateRecord
@@ -31,6 +31,7 @@ class CreateCall extends CreateRecord
                 'location' => new Point(floatval($data['location']['lng']), floatval($data['location']['lat'])),
                 'observation' => $data['observation'],
                 'association' => $data['association'],
+                'user_id' => Auth::id(),
             ]
         );
     }

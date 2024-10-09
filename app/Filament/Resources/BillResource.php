@@ -112,14 +112,6 @@ class BillResource extends Resource
                     ->label('Nome')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('call.biker.phone')
-                    ->label('Telefone')
-                    ->searchable()
-                    ->sortable()
-                    ->url(
-                        fn(Bill $record): string => LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->call->biker->phone), "Olá {$record->call->biker->name}"),
-                        shouldOpenInNewTab: true
-                    ),
                 TextColumn::make('value')
                     ->label('Valor')
                     ->money('BRL', locale: 'pt-BR')

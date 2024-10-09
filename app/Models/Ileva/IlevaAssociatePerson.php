@@ -21,9 +21,8 @@ class IlevaAssociatePerson extends Model
         return $this->hasOne(IlevaAssociate::class, 'id_pessoa');
     }
 
-    public function ilevaBills(): HasMany 
+    public function ilevaBills(): HasMany
     {
         return $this->hasMany(IlevaBill::class, 'id_pessoa');
     }
-    
 }

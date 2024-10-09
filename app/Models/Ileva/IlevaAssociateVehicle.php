@@ -5,6 +5,7 @@ namespace App\Models\Ileva;
 use App\Models\Call;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
@@ -65,5 +66,10 @@ class IlevaAssociateVehicle extends Model
             WHERE hab.id in (118,122,130,174,234,181,123,119,31)
             AND hav.dt_contrato >= '2024-08-01';
             ");
+    }
+
+    public function ilevaSituation(): BelongsTo
+    {
+        return $this->belongsTo(IlevaSituation::class, 'id_situacao');
     }
 }

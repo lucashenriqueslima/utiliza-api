@@ -108,6 +108,19 @@ class BikerController extends Controller
         return response(status: 200);
     }
 
+    public function updatePix(Request $request, Biker $biker)
+    {
+        $request->validate([
+            'pix' => 'required|string',
+        ]);
+
+        $biker->update(
+            $request->only('pix')
+        );
+
+        return response(status: 200);
+    }
+
     public function destroy(string $id)
     {
         //

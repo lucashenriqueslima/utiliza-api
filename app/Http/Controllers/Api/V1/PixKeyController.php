@@ -3,47 +3,44 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Biker;
+use App\Models\PixKey;
 use Illuminate\Http\Request;
 
 class PixKeyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function show(string $bikerId)
     {
-        //
+        $pixKey = PixKey::where('biker_id', $bikerId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$pixKey) {
+            return response()->json(status: 404);
+        }
+
+        return response()->json($pixKey);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request, string $bikerId)
     {
-        //
-    }
+        $request->validate([
+            'key' => 'required|string',
+            'type' => 'required|string|in:cpf,cnpj,phone,email',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        PixKey::where('biker_id', $bikerId)
+            ->update([
+                'is_active' => false
+            ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $pixKey = PixKey::create([
+            'key' => $request->key,
+            'type' => $request->type,
+            'biker_id' => $bikerId,
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json($pixKey, 201);
     }
 }

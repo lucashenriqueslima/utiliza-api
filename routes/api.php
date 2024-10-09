@@ -14,8 +14,10 @@ use App\Http\Controllers\Api\V1\CallController;
 use App\Http\Controllers\Api\V1\ExpertiseController;
 use App\Http\Controllers\Api\V1\ExpertiseFileValidationErrorController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
+use App\Http\Controllers\Api\V1\PixKeyController;
 use App\Http\Controllers\BikerChangeCallController;
 use App\Models\AuvoWorkshop;
+use App\Models\PixKeyHistory;
 use Illuminate\Support\Collection;
 
 Route::get('/', function () {
@@ -59,6 +61,9 @@ Route::prefix('v1')->group(function () {
         Route::post('call/{call}/expertise/create', [ExpertiseController::class, 'store']);
 
         Route::get('/call/{callId}/expertise/file-validation-errors', [ExpertiseFileValidationErrorController::class, 'index']);
+
+        Route::get('/biker/{biker}/pix-key', [PixKeyController::class, 'show']);
+        Route::post('/biker/{biker}/pix-key', [PixKeyController::class, 'store']);
 
         Route::get('/call/{call}/biker-change-call/reason', [BikerChangeCallController::class, 'showReason']);
     });

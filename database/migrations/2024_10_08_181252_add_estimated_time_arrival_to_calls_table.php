@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('biker_change_calls', function (Blueprint $table) {
-            $table->boolean('is_delivered')->default(false)->after('reason');
+        Schema::table('calls', function (Blueprint $table) {
+            $table->timestamp('estimated_time_arrival')->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('biker_change_calls', function (Blueprint $table) {
-            $table->dropColumn('is_delivered');
+        Schema::table('calls', function (Blueprint $table) {
+            $table->dropColumn('estimated_time_arrival');
         });
     }
 };

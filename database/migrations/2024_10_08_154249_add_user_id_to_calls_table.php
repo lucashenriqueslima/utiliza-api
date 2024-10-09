@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('auvo_workshops', function (Blueprint $table) {
-            $table->enum('association', ['solidy', 'nova', 'motoclub'])->after('auvo_collaborator_id');
+        Schema::table('calls', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained();
         });
     }
 
@@ -21,8 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('auvo_workshops', function (Blueprint $table) {
-            $table->dropColumn('association');
+        Schema::table('calls', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
         });
     }
 };

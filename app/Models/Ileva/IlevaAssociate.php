@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-Class IlevaAssociate extends Model
+class IlevaAssociate extends Model
 {
     use HasFactory;
 
@@ -20,7 +20,7 @@ Class IlevaAssociate extends Model
     protected function cpf(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => FormatHelper::cpfOrCnpj($value) 
+            get: fn(string $value) => FormatHelper::cpfOrCnpj($value)
         );
     }
 
@@ -28,9 +28,14 @@ Class IlevaAssociate extends Model
     {
         return $this->hasOne(IlevaAssociateVehicle::class, 'id_associado');
     }
-    
+
     public function ilevaPerson(): BelongsTo
     {
         return $this->belongsTo(IlevaAssociatePerson::class, 'id_pessoa', 'id')->orderBy('nome');
+    }
+
+    public function ilevaSituation(): BelongsTo
+    {
+        return $this->belongsTo(IlevaSituation::class, 'id_situacao');
     }
 }

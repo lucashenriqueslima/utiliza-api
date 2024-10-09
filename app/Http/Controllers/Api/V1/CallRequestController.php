@@ -14,6 +14,8 @@ use App\Models\Biker;
 use App\Models\Call;
 use App\Models\CallRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Number;
+
 
 class CallRequestController extends Controller
 {
@@ -28,10 +30,26 @@ class CallRequestController extends Controller
             'status' => CallRequestStatus::Accepted->value
         ]);
 
+        $distance = Biker::selectRaw(
+            '
+        ST_Distance_Sphere(POINT(?, ?), biker_geolocations.location) AS distance',
+            [
+                $call->location->longitude,
+                $call->location->latitude
+            ]
+        )
+            ->find($biker->id)
+            ->distance;
+
+        $distanceInKm = $distance / 1000;
+
+        $estimatedTimeArrival = now()->addMinutes(Number::format($distanceInKm * 4.2, precision: 0));
+
         $call->update([
             'biker_id' => $biker->id,
             'status' => CallStatus::WaitingArrival->value,
             'biker_accepted_at' => now(),
+            'estimated_time_arrival' => $estimatedTimeArrival,
         ]);
 
         $biker->update([

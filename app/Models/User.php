@@ -55,4 +55,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(BikerChangeCall::class);
     }
+
+    public function call(): HasMany
+    {
+        return $this->hasMany(Call::class);
+    }
 }

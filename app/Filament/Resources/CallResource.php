@@ -12,8 +12,11 @@ use App\Helpers\LinkGeneratorHelper;
 use App\Models\Associate;
 use App\Models\Call;
 use App\Models\Ileva\IlevaAssociate;
+use App\Models\Ileva\IlevaAssociatePerson;
 use App\Models\Ileva\IlevaAssociateVehicle;
+use App\Models\User;
 use App\Services\CallService;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -32,14 +35,30 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
-class CallResource extends Resource
+class CallResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Call::class;
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
     protected static ?string $modelLabel = 'Chamado';
     protected static ?int $navigationSort = 1;
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+            'update_responsable'
+        ];
+    }
 
     public static function form(Form $form): Form
     {
@@ -69,21 +88,15 @@ class CallResource extends Resource
                             fn(string $search): array =>
 
 
-                            IlevaAssociate::select('hbrd_asc_associado.id', 'hbrd_asc_pessoa.nome')
-                                ->selectSub(function ($query) {
-                                    $query->selectRaw('datediff(now(), ifnull(min(hbrd_finan_boleto.dt_vencimento), now()))')
-                                        ->from('hbrd_finan_boleto')
-                                        ->whereColumn('hbrd_finan_boleto.id_pessoa', 'hbrd_asc_pessoa.id')
-                                        ->where('situacao', 'Aberto')
-                                        ->where('hbrd_finan_boleto.dt_vencimento', '<', now())
-                                        ->groupBy('hbrd_finan_boleto.id_pessoa');
-                                }, 'days_without_payment')
-                                ->join('hbrd_asc_pessoa', 'hbrd_asc_associado.id_pessoa', '=', 'hbrd_asc_pessoa.id')
-                                ->orderBy('hbrd_asc_pessoa.nome')
-                                ->where('hbrd_asc_pessoa.nome', 'like', "%" . $search . "%")
+                            IlevaAssociatePerson::select('id', 'nome')
+                                ->with([
+                                    'ilevaAssociate:id,id_pessoa,id_situacao',
+                                    'ilevaAssociate.ilevaSituation:id,nome'
+                                ])
+                                ->where('nome', 'like', "%Lucas%")
                                 ->limit(50)
                                 ->get()
-                                ->mapWithKeys(fn($associate) => [$associate->id => "{$associate->nome} | " . ($associate->days_without_payment ?? '0') . ' dia(s) de atraso'])
+                                ->mapWithKeys(fn($associate) => [$associate->id => "{$associate->nome} | {$associate->ilevaAssociate->ilevaSituation->nome}"])
                                 ->toArray()
                         )
                         ->getOptionLabelUsing(fn($value) => IlevaAssociate::find($value)->person->nome ?? $value)
@@ -252,6 +265,10 @@ class CallResource extends Resource
                     ->searchable()
                     ->configure()
                     ->sortable(),
+                TextColumn::make('user.name')
+                    ->label('Responsável')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('association')
                     ->label('Associação')
                     ->searchable()
@@ -285,7 +302,7 @@ class CallResource extends Resource
                     ->label('Endereço')
                     ->searchable()
                     ->sortable()
-                    ->limit(50)
+                    ->limit(25)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
@@ -301,6 +318,20 @@ class CallResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge(),
+                TextColumn::make('estimated_time_arrival')
+                    ->label('Tempo Estimado de Chegada')
+                    ->getStateUsing(
+                        fn(Call $record): ?string =>
+                        $record->status == CallStatus::WaitingArrival ? $record->estimated_time_arrival : null
+                    )
+                    ->color(
+                        fn(Call $record): string =>
+                        Carbon::parse($record->estimated_time_arrival)->isPast() ? 'danger' : 'success'
+                    )
+                    ->weight('bold')
+                    ->searchable()
+                    ->sortable()
+                    ->since(),
                 TextColumn::make('location')
                     ->label('Distância/Tempo')
                     ->sortable()
@@ -340,22 +371,23 @@ class CallResource extends Resource
                     ->sortable()
                     ->url(fn(Call $record): ?string => $record->biker ? LinkGeneratorHelper::whatsapp(FormatHelper::onlyNumbers($record->biker?->phone), "Olá {$record->biker?->name}") : null, true)
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('validated_by')
-                    ->label('Validado(s) por:')
-                    ->getStateUsing(function ($record) {
-                        return $record->whereHas('expertises', function ($query) {
-                            $query->where('status', ExpertiseStatus::Done);
-                        })->with('expertises.user')?->get()->pluck('expertises')
-                            ->flatten()
-                            ->pluck('user')
-                            ->pluck('name')
-                            ->unique()
-                            ->implode(', ');
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                // TextColumn::make('validated_by')
+                //     ->label('Validado(s) por:')
+                //     ->getStateUsing(function ($record) {
+                //         return $record->whereHas('expertises', function ($query) {
+                //             $query->where('status', ExpertiseStatus::Done);
+                //         })->with('expertises.user')?->get()->pluck('expertises')
+                //             ->flatten()
+                //             ->pluck('user')
+                //             ->pluck('name')
+                //             ->unique()
+                //             ->implode(', ');
+                //     })
+                //     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->reorderable('sort')
             ->paginatedWhileReordering()
+            ->defaultSort('id', 'desc')
             ->filters([
                 SelectFilter::make('status')
                     ->multiple()
@@ -367,8 +399,13 @@ class CallResource extends Resource
                         'waiting_biker_see_validation' => 'Aguardando Motoboy Ver Validação',
                         'waiting_validation' => 'Aguardando Aprovação',
                         'approved' => 'Aprovado',
-                    ])
-                    ->default(['searching_biker', 'waiting_arrival', 'waiting_validation', 'in_service', 'in_validation', 'waiting_biker_see_validation'])
+                    ]),
+                SelectFilter::make('user_id')
+                    ->label('Responsável')
+                    ->multiple()
+                    ->options(
+                        User::select('id', 'name')->get()->pluck('name', 'id')
+                    )
             ])
             ->actions([
                 ActionGroup::make([
@@ -424,8 +461,22 @@ class CallResource extends Resource
                         ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::Approved])),
                 ])
             ])
-            ->bulkActions([])
-            ->poll('10s');
+            ->bulkActions([
+                BulkAction::make('change_user_responsable')
+                    ->label('Trocar Responsável')
+                    ->icon('heroicon-o-pencil')
+                    ->color('info')
+                    ->visible(fn(): bool => auth()->user()->can('update_responsable_call'))
+                    ->requiresConfirmation()
+                    ->form([
+                        Select::make('user_id')
+                            ->label('Responsável')
+                            ->options(fn() => User::select('id', 'name')->get()->pluck('name', 'id'))
+                            ->required(),
+                    ])
+                    ->action(fn(Collection $records, array $data) => $records->each(fn(Call $record) => $record->update(['user_id' => $data['user_id']]))),
+            ])
+            ->poll('25s');
     }
 
     public static function getRelations(): array
