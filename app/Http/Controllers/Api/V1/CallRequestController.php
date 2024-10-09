@@ -32,12 +32,14 @@ class CallRequestController extends Controller
 
         $distance = Biker::selectRaw(
             '
+        bikers.id,
         ST_Distance_Sphere(POINT(?, ?), biker_geolocations.location) AS distance',
             [
                 $call->location->longitude,
                 $call->location->latitude
             ]
         )
+            ->join('biker_geolocations', 'bikers.id', '=', 'biker_geolocations.biker_id')
             ->find($biker->id)
             ->distance;
 
