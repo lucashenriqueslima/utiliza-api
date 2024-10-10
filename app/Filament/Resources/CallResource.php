@@ -337,7 +337,9 @@ class CallResource extends Resource implements HasShieldPermissions
                     ->sortable()
                     ->getStateUsing(function ($record) {
 
-                        if ($record->biker_id == null) return null;
+                        if ($record->biker_id == null || $record->status == CallStatus::Approved) {
+                            return null;
+                        }
 
                         $rawDistance = DB::select(
                             'SELECT ST_Distance_Sphere(POINT(?, ?), bg.location) AS distance

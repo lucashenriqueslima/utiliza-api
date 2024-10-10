@@ -27,7 +27,7 @@ class Bill extends Model
                 ->value;
 
             #next friday day
-            $bill->due_date = Carbon::parse('next friday')->toDateString();
+            $bill->due_date = Carbon::parse('next monday')->toDateString();
         });
     }
 

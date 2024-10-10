@@ -43,6 +43,7 @@ class BillResource extends Resource
             ->schema([
                 FileUpload::make('payment_vouncher_file_path')
                     ->label('Comprovante de pagamento')
+                    ->visibility('public')
                     ->directory('public/payment_vounchers')
                     ->acceptedFileTypes(['image/*', 'application/pdf'])
                     ->imageEditor()
