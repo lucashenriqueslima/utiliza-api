@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\AccidentImageType;
 use App\Enums\AccidentStatus;
+use App\Enums\AssociationEnum;
 use App\Models\Accident;
 use App\Models\AccidentImage;
 use App\Services\S3\S3Service;
@@ -63,6 +64,10 @@ class AccidentExpertise extends Component implements HasForms, HasActions
         }
     }
 
+    public function getLinkByAssociation(): string
+    {
+        return $this->accident?->association->getLink() ?? AssociationEnum::Aprovel->getLink();
+    }
     public function getFileUploadComponent(AccidentImageType $accidentImageType): FileUpload
     {
         return FileUpload::make($accidentImageType->value)
@@ -207,7 +212,7 @@ class AccidentExpertise extends Component implements HasForms, HasActions
             'status' => AccidentStatus::Finished,
         ]);
 
-        $this->dispatch('redirect');
+        $this->dispatch('redirect', link: $this->getLinkByAssociation());
     }
     public function render()
     {

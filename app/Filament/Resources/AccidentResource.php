@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\AccidentStatus;
+use App\Enums\AssociationEnum;
 use App\Enums\VehicleType;
 use App\Filament\Resources\AccidentResource\Pages;
 use Webbingbrasil\FilamentCopyActions\Tables\Actions\CopyAction;
@@ -32,6 +33,10 @@ class AccidentResource extends Resource
                 Section::make('Associado')
                     ->columns(2)
                     ->schema([
+                        Select::make('association')
+                            ->label('Associação')
+                            ->options(AssociationEnum::class)
+                            ->required(),
                         TextInput::make('name')
                             ->label('Nome')
                             ->columnSpan(2)
@@ -69,6 +74,10 @@ class AccidentResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('association')
+                    ->label('Associação')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nome')
                     ->searchable()

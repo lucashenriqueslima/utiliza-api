@@ -10,6 +10,7 @@ enum AssociationEnum: string implements HasLabel
     case Nova = 'nova';
     case Motoclub = 'motoclub';
     case Aprovel = 'aprovel';
+    case Agsmb = 'agsmb';
 
     public function getLabel(): string
     {
@@ -31,6 +32,18 @@ enum AssociationEnum: string implements HasLabel
             self::Solidy => 'ileva',
             self::Nova => 'ileva_nova',
             self::Motoclub => 'ileva_motoclub',
+        };
+    }
+
+    public function getLink(): string
+    {
+        return match ($this) {
+            self::Solidy => 'https://solidy.org.br/',
+            self::Nova => 'https://novaprotecao.org.br/',
+            self::Motoclub => 'https://www.motoclub.org.br',
+            self::Aprovel => 'https://www.aaprovel.com.br/',
+            self::Agsmb => 'https://agsmb.org.br/',
+            default => 'https://www.aaprovel.com.br/',
         };
     }
 }

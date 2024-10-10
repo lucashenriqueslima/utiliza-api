@@ -22,10 +22,11 @@
 @script
 <script>
 
-$wire.on('redirect', () => {
+$wire.on('redirect', (link) => {
 
+    console.log('redirecting to: ', link.link);
     setTimeout(() => {
-        window.location.href = 'https://www.aaprovel.com.br/'
+        window.location.href = link.link;
     }, 3000);
 
 })
