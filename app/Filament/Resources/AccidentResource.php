@@ -36,6 +36,7 @@ class AccidentResource extends Resource
                         Select::make('association')
                             ->label('Associação')
                             ->options(AssociationEnum::class)
+                            ->columnSpanFull()
                             ->required(),
                         TextInput::make('name')
                             ->label('Nome')
