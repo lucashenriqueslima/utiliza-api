@@ -93,7 +93,7 @@ class CallResource extends Resource implements HasShieldPermissions
                                     'ilevaAssociate:id,id_pessoa,id_situacao',
                                     'ilevaAssociate.ilevaSituation:id,nome'
                                 ])
-                                ->where('nome', 'like', "%Lucas%")
+                                ->where('nome', 'like', "%{$search}%")
                                 ->limit(50)
                                 ->get()
                                 ->mapWithKeys(fn($associate) => [$associate->id => "{$associate->nome} | {$associate->ilevaAssociate->ilevaSituation->nome}"])
