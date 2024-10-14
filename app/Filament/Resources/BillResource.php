@@ -115,12 +115,12 @@ class BillResource extends Resource
                     ->sortable(),
                 TextColumn::make('call.biker.pix.key')
                     ->label('Chave PIX')
-                    ->getStateUsing(fn(Bill $record) => $record->call->biker->pixs->where('is_active', true)->first()->key)
+                    ->getStateUsing(fn(Bill $record) => $record->call->biker->pixs->where('is_active', true)->first()->key ?? 'N/A')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('call.biker.pix.type')
                     ->label('Tipo de chave PIX')
-                    ->getStateUsing(fn(Bill $record) => $record->call->biker->pixs->where('is_active', true)->first()->type)
+                    ->getStateUsing(fn(Bill $record) => $record->call->biker->pixs->where('is_active', true)->first()->type ?? 'N/A')
                     ->searchable()
                     ->sortable(),
 
