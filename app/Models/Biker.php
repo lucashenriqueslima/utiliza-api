@@ -49,4 +49,9 @@ class Biker extends Authenticatable
     {
         return $this->hasOne(Motorcycle::class);
     }
+
+    public function pixs(): HasMany
+    {
+        return $this->hasMany(PixKey::class);
+    }
 }

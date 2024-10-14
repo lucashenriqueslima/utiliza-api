@@ -15,6 +15,7 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
     case InValidation = 'in_validation';
     case WaitingBikerSeeValidation = 'waiting_biker_see_validation';
     case Approved = 'approved';
+    // case Cancelled = 'cancelled';
 
     public function getLabel(): string
     {

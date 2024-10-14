@@ -455,6 +455,29 @@ class CallResource extends Resource implements HasShieldPermissions
                         ->color('danger')
                         ->url(fn(Call $record): string => self::getUrl('validate', ['callId' => $record]))
                         ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
+                    // Action::make('call_cancell')
+                    //     ->label('Cancelar')
+                    //     ->icon('heroicon-o-x-circle')
+                    //     ->color('danger')
+                    //     ->form([
+                    //         TextArea::make('reason_cancell')
+                    //             ->label('Motivo do Cancelamento')
+                    //             ->placeholder('Digite o motivo do cancelamento...')
+                    //             ->required(),
+                    //     ])
+                    //     ->action(function (array $data, Call $record): void {
+                    //         $record->expertises()->update([
+                    //             'status' => ExpertiseStatus::Canceled
+                    //         ]);
+
+                    //         $record->status = CallStatus::Cancelled;
+                    //         $record->save();
+
+                    //         Notification::make()
+                    //             ->title('Chamado cancelado com sucesso')
+                    //             ->success()
+                    //             ->send();
+                    //     }),
                     Action::make('call_download')
                         ->label('Download')
                         ->icon('heroicon-o-arrow-down-circle')
