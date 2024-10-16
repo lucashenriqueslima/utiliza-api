@@ -21,13 +21,13 @@ class CallRequestController extends Controller
 {
     public function accept(Call $call, Biker $biker, CallRequest $callRequest, Request $request)
     {
-        $request->validate([
-            'app_version' => 'sometimes|string',
-        ]);
+        // $request->validate([
+        //     'app_version' => 'sometimes|string',
+        // ]);
 
-        if (empty($request->app_version) || $request->app_version != '1.0.1') {
-            return response()->json(['message' => 'Aplicativo desatualizado, entre em contato com atendente (62 9250-9220) e solicite a nova versão do APP'], 406);
-        }
+        // if (empty($request->app_version) || $request->app_version != '1.0.1') {
+        //     return response()->json(['message' => 'Aplicativo desatualizado, entre em contato com atendente (62 9250-9220) e solicite a nova versão do APP'], 406);
+        // }
 
 
         if (in_array($callRequest->status, [CallRequestStatus::NotAnsewered->value, CallRequestStatus::Denied->value])) {
