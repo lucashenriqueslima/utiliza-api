@@ -58,7 +58,7 @@ class CallRequestController extends Controller
 
         $distanceInKm = $distance / 1000;
 
-        $estimatedTimeArrival = now()->addMinutes((int) Number::format($distanceInKm * 4.2, precision: 0));
+        $estimatedTimeArrival = now()->addMinutes((int) Number::format($distanceInKm * 5, precision: 0));
 
         $call->update([
             'biker_id' => $biker->id,

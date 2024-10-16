@@ -338,7 +338,7 @@ class CallResource extends Resource implements HasShieldPermissions
                     ->sortable()
                     ->getStateUsing(function ($record) {
 
-                        if ($record->biker_id == null || $record->status == CallStatus::Approved) {
+                        if ($record->biker_id == null || in_array($record->status, [CallStatus::Approved, CallStatus::Cancelled])) {
                             return null;
                         }
 
