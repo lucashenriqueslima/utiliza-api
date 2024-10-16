@@ -518,7 +518,7 @@ class CallResource extends Resource implements HasShieldPermissions
                                 ->success()
                                 ->send();
                         })
-                        ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
+                        ->hidden(fn(Call $call): bool => in_array($call->status, [CallStatus::Approved, CallStatus::Cancelled])),
                 ])
             ])
             ->bulkActions([
