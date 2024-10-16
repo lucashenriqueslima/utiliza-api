@@ -21,6 +21,15 @@ class CallRequestController extends Controller
 {
     public function accept(Call $call, Biker $biker, CallRequest $callRequest, Request $request)
     {
+        $request->validate([
+            'app_version' => 'sometimes|string',
+        ]);
+
+        if (empty($request->app_version) || $request->app_version != '1.0.1') {
+            return response()->json(['message' => 'Atualize o aplicativo para aceitar chamados'], 400);
+        }
+
+
         if (in_array($callRequest->status, [CallRequestStatus::NotAnsewered->value, CallRequestStatus::Denied->value])) {
             return response()->json(['message' => 'Tempo para aceitar o chamado expirado.'], 400);
         }

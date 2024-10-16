@@ -3,7 +3,8 @@
 namespace App\Services\Firebase;
 
 use Google_Client;
-use Illuminate\Support\Facades\Log;
+
+use function Illuminate\Log\log;
 
 class FirebaseAuthService
 {
@@ -28,6 +29,8 @@ class FirebaseAuthService
             $this->googleClient->setAuthConfig($this->credentialsFilePath);
             $this->googleClient->addScope("https://www.googleapis.com/auth/firebase.messaging");
             $this->googleClient->fetchAccessTokenWithAssertion();
+
+            log($this->googleClient->getAccessToken());
 
             return $this->googleClient->getAccessToken();
         } catch (\Exception $e) {

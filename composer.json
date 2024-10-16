@@ -18,7 +18,7 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.28",
         "matanyadaev/laravel-eloquent-spatial": "^4.2",
-        "mongodb/mongodb": "^1.19",
+        "mongodb/mongodb": "^1.20",
         "php-mqtt/laravel-client": "^1.5",
         "stechstudio/laravel-zipstream": "^5.0",
         "webbingbrasil/filament-copyactions": "^3.0"

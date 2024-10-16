@@ -40,8 +40,20 @@ class CallObserver
             CallStatus::SearchingBiker => $this->handleSearchingBiker($call),
             CallStatus::WaitingValidation => $this->handleWaitingValidation($call),
             CallStatus::Approved => $this->handleApproved($call),
+            CallStatus::Cancelled => $this->handleCancelled($call),
             default => null,
         };
+    }
+
+    private function handleCancelled(Call $call): void
+    {
+
+        if (!$call->biker_id) {
+            StartLookingForBikerToCallJob::dispatch($call);
+
+            Expertise::where('call_id', $call->id)
+                ->update(['status' => ExpertiseStatus::Canceled]);
+        }
     }
 
     private function handleWaitingValidation(Call $call): void

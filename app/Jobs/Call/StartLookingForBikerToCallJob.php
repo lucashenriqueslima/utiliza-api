@@ -67,7 +67,7 @@ class StartLookingForBikerToCallJob implements ShouldQueue
         Log::info('Bikers: ' . $this->bikers->toJson());
 
         if ($this->bikers->isEmpty()) {
-            StartLookingForBikerToCallJob::dispatch($this->call)->delay(now()->addMinutes(2));
+            StartLookingForBikerToCallJob::dispatch($this->call);
             return;
         }
 

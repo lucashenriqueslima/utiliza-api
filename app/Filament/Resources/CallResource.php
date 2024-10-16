@@ -11,6 +11,7 @@ use App\Helpers\FormatHelper;
 use App\Helpers\LinkGeneratorHelper;
 use App\Models\Associate;
 use App\Models\Call;
+use App\Models\Expertise;
 use App\Models\Ileva\IlevaAssociate;
 use App\Models\Ileva\IlevaAssociatePerson;
 use App\Models\Ileva\IlevaAssociateVehicle;
@@ -439,6 +440,40 @@ class CallResource extends Resource implements HasShieldPermissions
 
                             Notification::make()
                                 ->title('A busca de um novo motoboy foi iniciada')
+                                ->success()
+                                ->send();
+                        })
+                        ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
+                    Action::make('cancel_call')
+                        ->label('Cancelar')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->form([
+                            TextArea::make('reason_change_biker')
+                                ->label('Motivo do Cancelamento')
+                                ->placeholder('Digite o motivo do cancelamento...')
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Call $record): void {
+
+                            $record->status = CallStatus::Cancelled;
+
+                            $record->save();
+
+                            if (!$record->biker_id) {
+
+                                $record->bikerChangeCalls()->create([
+                                    'biker_id' => $record->biker_id,
+                                    'user_id' => Auth::id(),
+                                    'reason' => $data['reason_change_biker'],
+                                ]);
+
+                                Expertise::where('call_id', $record->id)
+                                    ->update(['status' => ExpertiseStatus::Canceled]);
+                            }
+
+                            Notification::make()
+                                ->title('Chamado cancelado com sucesso')
                                 ->success()
                                 ->send();
                         })

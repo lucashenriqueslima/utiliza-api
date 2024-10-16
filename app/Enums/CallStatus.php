@@ -15,7 +15,7 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
     case InValidation = 'in_validation';
     case WaitingBikerSeeValidation = 'waiting_biker_see_validation';
     case Approved = 'approved';
-    // case Cancelled = 'cancelled';
+    case Cancelled = 'cancelled';
 
     public function getLabel(): string
     {
@@ -27,6 +27,7 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
             self::InValidation => 'Em validação',
             self::WaitingBikerSeeValidation => 'Aguardando motoboy ver validação',
             self::Approved => 'Aprovado',
+            self::Cancelled => 'Cancelado',
         };
     }
 
@@ -40,6 +41,7 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
             self::InValidation => 'info',
             self::WaitingBikerSeeValidation => 'info',
             self::Approved => 'success',
+            self::Cancelled => 'danger',
         };
     }
 
@@ -54,6 +56,7 @@ enum CallStatus: string implements HasLabel, HasColor, HasIcon
             self::InValidation => 'heroicon-o-eye',
             self::WaitingBikerSeeValidation => 'heroicon-o-eye',
             self::Approved => 'heroicon-m-check-badge',
+            self::Cancelled => 'heroicon-o-x-circle',
         };
     }
 }
