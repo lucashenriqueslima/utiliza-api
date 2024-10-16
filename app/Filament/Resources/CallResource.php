@@ -501,7 +501,7 @@ class CallResource extends Resource implements HasShieldPermissions
 
                             $record->save();
 
-                            if (!$record->biker_id) {
+                            if ($record->biker_id) {
 
                                 $record->bikerChangeCalls()->create([
                                     'biker_id' => $record->biker_id,
