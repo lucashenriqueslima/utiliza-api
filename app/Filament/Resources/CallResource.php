@@ -444,40 +444,6 @@ class CallResource extends Resource implements HasShieldPermissions
                                 ->send();
                         })
                         ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
-                    Action::make('cancel_call')
-                        ->label('Cancelar')
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->form([
-                            TextArea::make('reason_change_biker')
-                                ->label('Motivo do Cancelamento')
-                                ->placeholder('Digite o motivo do cancelamento...')
-                                ->required(),
-                        ])
-                        ->action(function (array $data, Call $record): void {
-
-                            $record->status = CallStatus::Cancelled;
-
-                            $record->save();
-
-                            if (!$record->biker_id) {
-
-                                $record->bikerChangeCalls()->create([
-                                    'biker_id' => $record->biker_id,
-                                    'user_id' => Auth::id(),
-                                    'reason' => $data['reason_change_biker'],
-                                ]);
-
-                                Expertise::where('call_id', $record->id)
-                                    ->update(['status' => ExpertiseStatus::Canceled]);
-                            }
-
-                            Notification::make()
-                                ->title('Chamado cancelado com sucesso')
-                                ->success()
-                                ->send();
-                        })
-                        ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
                     Action::make('locate_biker')
                         ->label('Localizar Motoboy')
                         ->icon('heroicon-o-map-pin')
@@ -519,6 +485,40 @@ class CallResource extends Resource implements HasShieldPermissions
                         ->color('success')
                         ->url(fn(Call $record): string => route('call.download', $record->id), true)
                         ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::Approved])),
+                    Action::make('cancel_call')
+                        ->label('Cancelar')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->form([
+                            TextArea::make('reason_change_biker')
+                                ->label('Motivo do Cancelamento')
+                                ->placeholder('Digite o motivo do cancelamento...')
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Call $record): void {
+
+                            $record->status = CallStatus::Cancelled;
+
+                            $record->save();
+
+                            if (!$record->biker_id) {
+
+                                $record->bikerChangeCalls()->create([
+                                    'biker_id' => $record->biker_id,
+                                    'user_id' => Auth::id(),
+                                    'reason' => $data['reason_change_biker'],
+                                ]);
+
+                                Expertise::where('call_id', $record->id)
+                                    ->update(['status' => ExpertiseStatus::Canceled]);
+                            }
+
+                            Notification::make()
+                                ->title('Chamado cancelado com sucesso')
+                                ->success()
+                                ->send();
+                        })
+                        ->hidden(fn(Call $call): bool => $call->status == CallStatus::Approved),
                 ])
             ])
             ->bulkActions([
@@ -536,7 +536,7 @@ class CallResource extends Resource implements HasShieldPermissions
                     ])
                     ->action(fn(Collection $records, array $data) => $records->each(fn(Call $record) => $record->update(['user_id' => $data['user_id']]))),
             ])
-            ->poll('25s');
+            ->poll('20s');
     }
 
     public static function getRelations(): array

@@ -26,7 +26,7 @@ class CallRequestController extends Controller
         ]);
 
         if (empty($request->app_version) || $request->app_version != '1.0.1') {
-            return response()->json(['message' => 'Atualize o aplicativo para aceitar chamados'], 400);
+            return response()->json(['message' => 'Aplicativo desatualizado, entre em contato com atendente (62 9250-9220) e solicite a nova versão do APP'], 406);
         }
 
 
