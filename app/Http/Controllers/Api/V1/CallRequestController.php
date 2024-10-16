@@ -34,6 +34,10 @@ class CallRequestController extends Controller
             return response()->json(['message' => 'Tempo para aceitar o chamado expirado.'], 400);
         }
 
+        if ($call->status !== CallStatus::SearchingBiker) {
+            return response()->json(['message' => 'Chamado não está mais disponível.'], 400);
+        }
+
         $callRequest->update([
             'biker_id' => $biker->id,
             'status' => CallRequestStatus::Accepted->value

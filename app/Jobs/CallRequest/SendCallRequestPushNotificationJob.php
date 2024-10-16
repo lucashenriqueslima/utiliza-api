@@ -2,6 +2,7 @@
 
 namespace App\Jobs\CallRequest;
 
+use App\Enums\CallStatus;
 use App\Jobs\Call\HandleCallContinuityAfterCallRequestJob;
 use App\Models\Biker;
 use App\Models\CallRequest;
@@ -36,11 +37,19 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
      */
     public function handle(): void
     {
+
+        $this->call->refresh();
+
+        if ($this->call->status !== CallStatus::SearchingBiker) {
+            return;
+        }
+
         try {
             $firebaseService = new FirebaseService((new FirebaseAuthService())->getAccessToken());
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
+
         $biker = $this->bikers->shift();
         $this->distances;
 
