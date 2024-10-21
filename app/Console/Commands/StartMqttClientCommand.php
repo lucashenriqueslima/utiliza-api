@@ -74,7 +74,6 @@ class StartMqttClientCommand extends Command implements Isolatable
 
         foreach ($newPublishes as $publish) {
             $mqttService->publish($publish['topic'], $publish['message']);
-            Log::info(sprintf("Published message on topic [%s]: %s", $publish['topic'], $publish['message']));
         }
     }
 
@@ -133,8 +132,6 @@ class StartMqttClientCommand extends Command implements Isolatable
             $this->handleSubscriptions($mqttService, $bikerGeolocationService);
 
             $mqttService->registerLoopEvent();
-
-            Log::info(sprintf("New publishes: %s", json_encode($this->newPublishes)));
 
             $this->handlePublishes($mqttService, $this->newPublishes, $this->oldPublishes);
 
