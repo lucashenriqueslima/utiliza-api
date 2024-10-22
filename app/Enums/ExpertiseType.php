@@ -6,4 +6,6 @@ enum ExpertiseType: string
 {
     case Main = 'main';
     case Secondary = 'secondary';
+
+    case General = 'general';
 }

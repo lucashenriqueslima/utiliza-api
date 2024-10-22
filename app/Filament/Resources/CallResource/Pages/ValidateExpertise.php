@@ -54,7 +54,7 @@ class ValidateExpertise extends Page implements HasForms
 
     protected static string $view = 'filament.resources.call-resource.pages.validate-expertise';
 
-    protected static ?string $title = 'Validar Perícia';
+    protected static ?string $title = 'Validar Vistorias';
     public ?array $data = [];
     public ?Collection $expertises;
     public AssociateCar $associateCar;
@@ -154,8 +154,8 @@ class ValidateExpertise extends Page implements HasForms
                             Textarea::make("{$associateExpertise->id}.{$associateExpertiseFile->id}.refusal_description")
                                 ->label('Motivo da recusa')
                                 ->placeholder('Descreva o motivo da recusa...')
-                                ->disabled(fn (Get $get) => ($get("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved")))
-                                ->required(fn (Get $get) => ($get("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved") == false))
+                                ->disabled(fn(Get $get) => ($get("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved")))
+                                ->required(fn(Get $get) => ($get("{$associateExpertise->id}.{$associateExpertiseFile->id}.is_approved") == false))
                         ])
                     ]);
             });
@@ -163,7 +163,7 @@ class ValidateExpertise extends Page implements HasForms
         return Section::make($this->associate->name . ' - ' . $this->associateCar->plate)
             ->description('Associado')
             ->columns(2)
-            ->icon(fn (): string => in_array($associateExpertise->id, $this->expertiseAlreadyAnswered) ? 'heroicon-o-check-circle' : 'heroicon-o-exclamation-circle')
+            ->icon(fn(): string => in_array($associateExpertise->id, $this->expertiseAlreadyAnswered) ? 'heroicon-o-check-circle' : 'heroicon-o-exclamation-circle')
             ->collapsed()
             ->schema([
                 ...$associateFormFields
@@ -186,7 +186,7 @@ class ValidateExpertise extends Page implements HasForms
                 ->description('Terceiro')
                 ->columns(2)
                 ->collapsed()
-                ->icon(fn (): string => in_array($thirdPartyExpertise->id, $this->expertiseAlreadyAnswered) ? 'heroicon-o-check-circle' : 'heroicon-o-exclamation-circle')
+                ->icon(fn(): string => in_array($thirdPartyExpertise->id, $this->expertiseAlreadyAnswered) ? 'heroicon-o-check-circle' : 'heroicon-o-exclamation-circle')
                 ->schema([
                     ...$thirdPartyExpertise->files
                         ->where('file_expertise_type', '!=', ExpertiseFileType::DynamicImage)
@@ -211,8 +211,8 @@ class ValidateExpertise extends Page implements HasForms
                                         Textarea::make("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.refusal_description")
                                             ->label('Motivo da recusa')
                                             ->placeholder('Descreva o motivo da recusa...')
-                                            ->disabled(fn (Get $get) => ($get("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.is_approved")))
-                                            ->required(fn (Get $get) => ($get("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.is_approved") == false))
+                                            ->disabled(fn(Get $get) => ($get("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.is_approved")))
+                                            ->required(fn(Get $get) => ($get("{$thirdPartyExpertise->id}.{$thirdPartyFile->id}.is_approved") == false))
                                     ])
                                 ]);
                         })

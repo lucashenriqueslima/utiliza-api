@@ -24,7 +24,7 @@ class Bill extends Model
             $bill->value = CallValue::where('is_valid', true)
                 ->latest()
                 ->first()
-                ->value;
+                ->value ?? 50;
 
             #next friday day
             $bill->due_date = Carbon::parse('next monday')->toDateString();

@@ -7,6 +7,7 @@ use App\Enums\ExpertiseStatus;
 use App\Filament\Resources\CallResource;
 use App\Filament\Resources\CallResource\Pages\ValidateExpertise;
 use App\Jobs\Call\StartLookingForBikerToCallJob;
+use App\Models\Bill;
 use App\Models\Call;
 use App\Models\Expertise;
 use App\Models\User;
@@ -87,6 +88,9 @@ class CallObserver
 
     private function handleApproved(Call $call): void
     {
-        $call->bill()->create();
+        //firstOrCreate bill
+        Bill::firstOrCreate([
+            'call_id' => $call->id,
+        ]);
     }
 }

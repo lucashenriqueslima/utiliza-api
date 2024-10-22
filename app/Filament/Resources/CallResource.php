@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Enums\AssociationEnum;
 use App\Enums\CallStatus;
+use App\Enums\ExpertiseFileType;
 use App\Enums\ExpertiseStatus;
+use App\Enums\ExpertiseType;
 use App\Filament\Pages\ValidateExpertise;
 use App\Filament\Resources\CallResource\Pages;
 use App\Helpers\FormatHelper;
@@ -27,6 +29,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
+use Faker\Core\File;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -356,7 +360,7 @@ class CallResource extends Resource implements HasShieldPermissions
                         $distance = number_format($rawDistance[0]->distance / 1000, 1);
 
 
-                        return str_replace('.', ',', number_format($distance * 3.5) . " min ( " . $distance * 1.5 . " km)");
+                        return '';
                     }),
                 TextColumn::make('created_at')
                     ->label('Data de Criação')
@@ -456,29 +460,46 @@ class CallResource extends Resource implements HasShieldPermissions
                         ->color('danger')
                         ->url(fn(Call $record): string => self::getUrl('validate', ['callId' => $record]))
                         ->hidden(fn(Call $call): bool => !in_array($call->status, [CallStatus::WaitingValidation, CallStatus::InValidation])),
-                    // Action::make('call_cancell')
-                    //     ->label('Cancelar')
-                    //     ->icon('heroicon-o-x-circle')
-                    //     ->color('danger')
-                    //     ->form([
-                    //         TextArea::make('reason_cancell')
-                    //             ->label('Motivo do Cancelamento')
-                    //             ->placeholder('Digite o motivo do cancelamento...')
-                    //             ->required(),
-                    //     ])
-                    //     ->action(function (array $data, Call $record): void {
-                    //         $record->expertises()->update([
-                    //             'status' => ExpertiseStatus::Canceled
-                    //         ]);
+                    Action::make('upload_expertise_files')
+                        ->label('Carregar Arquivos')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('info')
+                        ->form([
 
-                    //         $record->status = CallStatus::Cancelled;
-                    //         $record->save();
+                            FileUpload::make('expertise_files')
+                                ->label('Arquivos da Vistoria')
+                                ->placeholder('Arquivos de vistoria...')
+                                ->multiple()
+                                ->visibility('public')
+                                ->directory('public/expertise')
+                                ->required(),
 
-                    //         Notification::make()
-                    //             ->title('Chamado cancelado com sucesso')
-                    //             ->success()
-                    //             ->send();
-                    //     }),
+
+                        ])
+                        ->action(function (array $data, Call $record): void {
+                            $expertise = $record->expertises()->create([
+                                'type' => ExpertiseType::General,
+                                'status' => ExpertiseStatus::Done,
+                            ]);
+
+                            $expertise->files()->createMany(
+                                collect($data['expertise_files'])
+                                    ->map(fn($file) => [
+                                        'path' => $file,
+                                        'file_expertise_type' => ExpertiseFileType::DynamicImage,
+                                    ])
+                                    ->toArray()
+                            );
+
+                            $record->status = CallStatus::Approved;
+                            $record->save();
+
+                            Notification::make()
+                                ->title('Arquivos enviados com sucesso!')
+                                ->success()
+                                ->send();
+                        })
+                        ->visible(fn(Call $call): bool => in_array($call->status, [CallStatus::Cancelled, CallStatus::Approved])),
                     Action::make('call_download')
                         ->label('Download')
                         ->icon('heroicon-o-arrow-down-circle')
