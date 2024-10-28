@@ -11,7 +11,6 @@ class LocavibeRenter extends Model
     use HasFactory, Notifiable;
 
     protected $connection = 'locavibe';
-    protected $collection = 'renters';
+    protected $table = 'renters';
     protected $guarded = [];
-    
 }
