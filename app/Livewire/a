@@ -1,0 +1,102 @@
+[
+    {
+        "resposta": "Edmilson da Silva Gomes ",
+        "variavel": "{[assos_profissao]}",
+        "descricao": "Representante legal, Profissão"
+    },
+    {
+        "resposta": "SSP BA ",
+        "variavel": "{[assos_orgao_exp]}",
+        "descricao": "Orgão Exp"
+    },
+    {
+        "resposta": "163 a",
+        "variavel": "{[assos_numero]}",
+        "descricao": "Qual o numero da residencia?"
+    },
+    {
+        "resposta": "Centro ",
+        "variavel": "{[assos_bairro]}",
+        "descricao": "Qual seu bairro?"
+    },
+    {
+        "resposta": "Não ",
+        "variavel": "{[assos_ponto_ref]}",
+        "descricao": "Tem algum ponto de referência da sua residencia?"
+    },
+    {
+        "resposta": "Preto ",
+        "variavel": "{[cor]}",
+        "descricao": "Qual a cor do veiculo?"
+    },
+    {
+        "resposta": "4",
+        "variavel": "{[qrPorta]}",
+        "descricao": "Qual a quantidade de portas do veiculo?"
+    },
+    {
+        "resposta": "-",
+        "variavel": "{[veic_km]}",
+        "descricao": "Qual a kilometragem do veiculo?"
+    },
+    {
+        "resposta": "Flex",
+        "variavel": "{[veic_combustivel]}",
+        "descricao": "Qual o combustível do veiculo? (Flex,Diesel,Gasolina,Etanol)"
+    },
+    {
+        "resposta": "15 março ",
+        "variavel": "{[venc_mensal]}",
+        "descricao": "Qual dia sera o vencimento da mensalidade?"
+    },
+    {
+        "resposta": "-",
+        "variavel": "{[valorassis_prof]}",
+        "descricao": "Qual o valor que adicionou na assistência profissional? ( Caso não tenha adicionado coloque \"0\")"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente1]}",
+        "descricao": "Nome do Dependente 1"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente2]}",
+        "descricao": "Nome do Dependente 2"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente3]}",
+        "descricao": "Nome do Dependente 3"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente4]}",
+        "descricao": "Nome do Dependente 4"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente5]}",
+        "descricao": "Nome do Dependente 5"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente6]}",
+        "descricao": "Nome do Dependente 6"
+    },
+    {
+        "resposta": "I",
+        "variavel": "{[dependente7]}",
+        "descricao": "Nome do Dependente 7"
+    },
+    {
+        "resposta": "O",
+        "variavel": "{[dependente8]}",
+        "descricao": "Nome do Dependente 8"
+    },
+    {
+        "resposta": "-",
+        "variavel": "{[obs]}",
+        "descricao": "Observações:"
+    }
+]

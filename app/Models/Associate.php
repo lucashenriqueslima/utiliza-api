@@ -18,26 +18,31 @@ class Associate extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => strtoupper($value)
+            set: fn(string $value) => strtoupper($value)
         );
     }
 
     protected function cpf(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => FormatHelper::cpfOrCnpj($value)
+            set: fn(string $value) => FormatHelper::cpfOrCnpj($value)
         );
     }
 
     protected function phone(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => FormatHelper::phone($value)
+            set: fn(string $value) => FormatHelper::phone($value)
         );
     }
 
     public function car(): HasMany
     {
         return $this->hasMany(AssociateCar::class);
+    }
+
+    public function dependents(): HasMany
+    {
+        return $this->hasMany(Dependent::class);
     }
 }
