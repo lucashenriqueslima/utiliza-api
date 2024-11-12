@@ -99,7 +99,8 @@ class DependentResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->whereBetween('contract_date', [$data['initial_date'], $data['final_date']]);
+                            ->when($data['initial_date'], fn($query, $initial_date) => $query->where('contract_date', '>=', $initial_date))
+                            ->when($data['final_date'], fn($query, $final_date) => $query->where('contract_date', '<=', $final_date));
                     })
             ])
             ->actions([
