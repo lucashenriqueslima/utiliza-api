@@ -92,8 +92,10 @@ class DependentResource extends Resource
                 Filter::make('contract_date')
                     ->label('Data do Contrato')
                     ->form([
-                        DatePicker::make('initial_date'),
-                        DatePicker::make('final_date'),
+                        DatePicker::make('initial_date')
+                            ->label('Data Inicial'),
+                        DatePicker::make('final_date')
+                            ->label('Data Final'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
