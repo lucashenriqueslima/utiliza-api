@@ -7,11 +7,13 @@ use App\Filament\Resources\DependentResource\Pages;
 use App\Filament\Resources\DependentResource\RelationManagers;
 use App\Models\Dependent;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -87,6 +89,16 @@ class DependentResource extends Resource
                     ->label('Situação')
                     ->multiple()
                     ->options(fn() => Dependent::query()->pluck('situation')->unique()->mapWithKeys(fn($situation) => [$situation => $situation])->toArray()),
+                Filter::make('contract_date')
+                    ->label('Data do Contrato')
+                    ->form([
+                        DatePicker::make('initial_date'),
+                        DatePicker::make('final_date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->whereBetween('contract_date', [$data['initial_date'], $data['final_date']]);
+                    })
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
