@@ -24,6 +24,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class BillResource extends Resource
 {
@@ -158,6 +159,8 @@ class BillResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->action(fn(Collection $records) => $records->each(fn(Bill $record) => $record->update(['status' => BillStatus::Paid->value]))),
+                ExportBulkAction::make()
+                    ->label('Exportar')
             ]);
     }
 

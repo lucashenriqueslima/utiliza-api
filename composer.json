@@ -20,6 +20,7 @@
         "matanyadaev/laravel-eloquent-spatial": "^4.2",
         "mongodb/mongodb": "^1.20",
         "php-mqtt/laravel-client": "^1.5",
+        "pxlrbt/filament-excel": "^2.3",
         "stechstudio/laravel-zipstream": "^5.0",
         "webbingbrasil/filament-copyactions": "^3.0"
     },
