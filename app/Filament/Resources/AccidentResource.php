@@ -5,6 +5,9 @@ namespace App\Filament\Resources;
 use App\Enums\AccidentStatus;
 use App\Enums\AssociationEnum;
 use App\Enums\VehicleType;
+use App\Filament\Forms\Components\CpfTextInputComponent;
+use App\Filament\Forms\Components\NameTextInputComponent;
+use App\Filament\Forms\Components\PhoneTextInputComponent;
 use App\Filament\Resources\AccidentResource\Pages;
 use Webbingbrasil\FilamentCopyActions\Tables\Actions\CopyAction;
 use App\Models\Accident;
@@ -24,7 +27,7 @@ class AccidentResource extends Resource
 {
     protected static ?string $model = Accident::class;
     protected static ?string $navigationIcon = 'heroicon-o-link';
-    protected static ?string $modelLabel = 'Sinistro';
+    protected static ?string $modelLabel = 'Vistorias Externa';
 
     public static function form(Form $form): Form
     {
@@ -38,20 +41,10 @@ class AccidentResource extends Resource
                             ->options(AssociationEnum::class)
                             ->columnSpanFull()
                             ->required(),
-                        TextInput::make('name')
-                            ->label('Nome')
-                            ->columnSpan(2)
-                            ->required(),
-                        TextInput::make('phone')
-                            ->label('Telefone')
-                            ->mask('(99) 99999-9999')
-                            ->length(15)
-                            ->required(),
-                        TextInput::make('cpf')
-                            ->label('CPF')
-                            ->mask('999.999.999-99')
-                            ->length(14)
-                            ->required(),
+                        NameTextInputComponent::make()
+                            ->columnSpan(2),
+                        PhoneTextInputComponent::make(),
+                        CpfTextInputComponent::make(),
                     ]),
                 Section::make('Veículo')
                     ->columns(2)
@@ -131,7 +124,11 @@ class AccidentResource extends Resource
                         ->hidden(fn(Accident $record): bool => $record->status === AccidentStatus::Pending),
                 ])
             ])
-            ->bulkActions([])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
             ->recordUrl(null)
             ->poll('60s');
     }

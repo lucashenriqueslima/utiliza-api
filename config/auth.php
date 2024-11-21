@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'bikers',
         ],
+        'api_out_system' => [
+            'driver' => 'session',
+            'provider' => 'out_systems',
+        ],
     ],
 
     /*
@@ -71,6 +75,11 @@ return [
         'bikers' => [
             'driver' => 'eloquent',
             'model' => App\Models\Biker::class,
+        ],
+
+        'out_systems' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\OutSystemToken::class,
         ],
     ],
 

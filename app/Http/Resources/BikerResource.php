@@ -23,7 +23,7 @@ class BikerResource extends JsonResource
             'phone' => $this->phone,
             'status' => $this->status,
             'api_token' => $this->createToken('authToken')->plainTextToken,
-            'motorcycle' => new MotorcycleResource($this->motorcycle),
+            // 'motorcycle' => new MotorcycleResource($this->motorcycle),
         ];
     }
 }

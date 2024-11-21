@@ -11,6 +11,9 @@ enum BikerStatus: string implements HasLabel, HasColor, HasIcon
     case Avaible = 'avaible';
     case NotAvaible = 'not_avaible';
     case Busy = 'busy';
+    case Banned = 'banned';
+    case Inactive = 'inactive';
+    case PendingAuthentication = 'pending_authenticator';
 
     public function getLabel(): string
     {
@@ -18,6 +21,9 @@ enum BikerStatus: string implements HasLabel, HasColor, HasIcon
             self::Avaible => 'Disponível',
             self::NotAvaible => 'Indisponível',
             self::Busy => 'Em Serviço',
+            self::Banned => 'Banido',
+            self::Inactive => 'Inativo',
+            self::PendingAuthentication => 'Pendente Autenticação',
         };
     }
 
@@ -27,6 +33,9 @@ enum BikerStatus: string implements HasLabel, HasColor, HasIcon
             self::NotAvaible => 'danger',
             self::Avaible => 'success',
             self::Busy => 'info',
+            self::Banned => 'danger',
+            self::Inactive => 'danger',
+            self::PendingAuthentication => 'warning',
         };
     }
 
@@ -37,6 +46,9 @@ enum BikerStatus: string implements HasLabel, HasColor, HasIcon
             self::Avaible => 'heroicon-o-magnifying-glass',
             self::Busy => 'heroicon-o-map-pin',
             self::NotAvaible => 'heroicon-o-camera',
+            self::Banned => 'heroicon-o-exclamation-circle',
+            self::Inactive => 'heroicon-o-exclamation-circle',
+            self::PendingAuthentication => 'heroicon-o-clock',
         };
     }
 }

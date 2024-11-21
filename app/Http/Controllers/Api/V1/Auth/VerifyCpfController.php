@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Enums\BikerStatus;
 use App\Http\Controllers\Controller;
 use App\Jobs\Auth\SendAuthenticationTokenJob;
+use App\Models\Biker;
 use App\Models\Locavibe\LocavibeRenter;
 use App\Services\Auth\AuthService;
 use App\Services\Auth\GenerateAuthenticationToken;
@@ -11,37 +13,49 @@ use App\Services\Auth\SendAuthenticationToken;
 use App\Traits\HttpResponses;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Laravel\Octane\Facades\Octane;
 
 class VerifyCpfController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, AuthService $authService)
     {
         $request->validate([
             'cpf' => 'required|string|size:14'
         ]);
 
         try {
-            $locavibeRenter = LocavibeRenter::where('cpf', $request->cpf)->firstOrFail();
+            $partiner = Biker::where('cpf', $request->cpf)->first();
 
-            $authToken = AuthService::generateAuthenticationToken();
+            $partiner ??=  $authService->updateOrCreatePartinerByLocavibeRenter(LocavibeRenter::where('cpf', $request->cpf)->first());
 
-            SendAuthenticationTokenJob::dispatch($locavibeRenter, $authToken);
+            if (!$partiner) {
+                return response()->json([
+                    'message' => 'CPF não encontrado'
+                ], 404);
+            }
 
-            $locavibeRenter->authToken = $authToken;
-            $locavibeRenter->authTokenVerified = false;
+            if ($partiner?->status === BikerStatus::Banned) {
+                return response()->json([
+                    'message' => 'Usuário banido'
+                ], 403);
+            }
 
-            $locavibeRenter->save();
+            $authToken = $authService->generateAuthenticationToken();
 
-            $maskedEmail = AuthService::maskEmail($locavibeRenter->email);
+            SendAuthenticationTokenJob::dispatch($partiner, $authToken);
+
+            $authService->saveMailAuthToken($partiner, $authToken);
+
+            $maskedEmail = $authService->maskEmail($partiner->email);
 
             return response()->json([
                 'masked_email' => $maskedEmail
             ]);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'message' => 'CPF não encontrado'
-            ], 404);
-        } catch (\Exception) {
+        } catch (\Exception $e) {
+
+            Log::error($e->getMessage());
+
             return response()->json([
                 'message' => 'Erro ao gerar token de autenticação'
             ], 500);

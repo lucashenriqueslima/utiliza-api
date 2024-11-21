@@ -44,6 +44,7 @@ use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class CallResource extends Resource implements HasShieldPermissions
 {
@@ -372,6 +373,21 @@ class CallResource extends Resource implements HasShieldPermissions
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('thirdParties.name')
+                    ->label('Terceiro(s) | Nome(s)')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('thirdParties.phone')
+                    ->label('Terceiro(s) | Telefone(s)')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('thirdParties.car.plate')
+                    ->label('Terceiro(s) | Placa(s)')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('biker.phone')
                     ->label('Motoboy | Telefone')
                     ->searchable()
@@ -556,6 +572,8 @@ class CallResource extends Resource implements HasShieldPermissions
                             ->required(),
                     ])
                     ->action(fn(Collection $records, array $data) => $records->each(fn(Call $record) => $record->update(['user_id' => $data['user_id']]))),
+                ExportBulkAction::make()
+                    ->label('Exportar'),
             ])
             ->poll('20s');
     }

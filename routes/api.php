@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\OutSystem\V1\Auth\LoginController as OutSystemLoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\BikerGeolocationController;
 use App\Http\Controllers\Api\V1\BillController;
@@ -16,7 +17,11 @@ use App\Http\Controllers\Api\V1\ExpertiseFileValidationErrorController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
 use App\Http\Controllers\Api\V1\PixKeyController;
 use App\Http\Controllers\BikerChangeCallController;
+use App\Models\Accident;
 use App\Models\AuvoWorkshop;
+use App\Models\Biker;
+use App\Models\Bill;
+use App\Models\Call;
 use App\Models\PixKeyHistory;
 use Illuminate\Support\Collection;
 
@@ -66,5 +71,31 @@ Route::prefix('v1')->group(function () {
         Route::post('/biker/{biker}/pix-key', [PixKeyController::class, 'store']);
 
         Route::get('/call/{call}/biker-change-call/reason', [BikerChangeCallController::class, 'showReason']);
+    });
+});
+
+Route::prefix('out-systems/v1')->group(function () {
+    Route::prefix('auth')->group(function () {
+        Route::post('/login', [OutSystemLoginController::class, 'store']);
+    });
+
+    Route::group(['middleware' => ['auth:sanctum']], function () {
+        Route::get('/accidents', function () {
+            return Accident::all();
+        });
+
+        Route::get('/calls', function () {
+            return Call::all();
+        });
+
+        Route::get('/bills', function () {
+            return Bill::all();
+        });
+
+        Route::get('/bikers', function () {
+            return Biker::all();
+        });
+
+        Route::post('auth/logout', [LogoutController::class, 'destroy']);
     });
 });

@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Call;
+use App\Models\Dependent;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class CallPolicy
+class DependentPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class CallPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_call');
+        return $user->can('view_any_dependent');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Call $call): bool
+    public function view(User $user, Dependent $dependent): bool
     {
-        return $user->can('view_call');
+        return $user->can('view_dependent');
     }
 
     /**
@@ -31,23 +31,23 @@ class CallPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_call');
+        return $user->can('create_dependent');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Call $call): bool
+    public function update(User $user, Dependent $dependent): bool
     {
-        return $user->can('update_call');
+        return $user->can('update_dependent');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Call $call): bool
+    public function delete(User $user, Dependent $dependent): bool
     {
-        return $user->can('delete_call');
+        return $user->can('delete_dependent');
     }
 
     /**
@@ -55,15 +55,15 @@ class CallPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_call');
+        return $user->can('delete_any_dependent');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Call $call): bool
+    public function forceDelete(User $user, Dependent $dependent): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_dependent');
     }
 
     /**
@@ -71,15 +71,15 @@ class CallPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_dependent');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Call $call): bool
+    public function restore(User $user, Dependent $dependent): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_dependent');
     }
 
     /**
@@ -87,15 +87,15 @@ class CallPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_dependent');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Call $call): bool
+    public function replicate(User $user, Dependent $dependent): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('replicate_dependent');
     }
 
     /**
@@ -103,6 +103,6 @@ class CallPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('reorder_dependent');
     }
 }

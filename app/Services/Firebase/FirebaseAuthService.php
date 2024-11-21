@@ -3,6 +3,7 @@
 namespace App\Services\Firebase;
 
 use Google_Client;
+use Illuminate\Support\Facades\Log;
 
 use function Illuminate\Log\log;
 

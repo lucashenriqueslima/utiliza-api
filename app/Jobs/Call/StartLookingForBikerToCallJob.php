@@ -28,19 +28,24 @@ class StartLookingForBikerToCallJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected Call $call;
+
     protected Collection $bikers;
     public function __construct(
-        Call $call
-    ) {
-        $this->call = $call;
-    }
+        protected Call $call
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
+
+        // $this->call->refresh();
+
+        // if ($this->call->status !== CallStatus::SearchingBiker) {
+        //     dd($this->call->status);
+        //     return;
+        // }
 
         $blockedUserIds = BikerChangeCall::where('call_id', $this->call->id)
             ->pluck('biker_id');
@@ -67,7 +72,7 @@ class StartLookingForBikerToCallJob implements ShouldQueue
         Log::info('Bikers: ' . $this->bikers->toJson());
 
         if ($this->bikers->isEmpty()) {
-            StartLookingForBikerToCallJob::dispatch($this->call);
+            StartLookingForBikerToCallJob::dispatch($this->call)->delay(now()->addMinutes(2));
             return;
         }
 

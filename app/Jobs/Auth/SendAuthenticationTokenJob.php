@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Auth;
 
+use App\Models\Biker;
 use App\Models\Locavibe\LocavibeRenter;
 use App\Notifications\AuthenticationTokenNotification;
 use Illuminate\Bus\Queueable;
@@ -18,16 +19,15 @@ class SendAuthenticationTokenJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        protected LocavibeRenter $locavibeRenter,
+        protected Biker $renter,
         protected string $authToken
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $this->locavibeRenter->notify(new AuthenticationTokenNotification($this->authToken));
+        $this->renter->notify(new AuthenticationTokenNotification($this->authToken));
     }
 }

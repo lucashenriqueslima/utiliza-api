@@ -30,7 +30,7 @@ class AuvoCollaboratorResource extends Resource
 {
     protected static ?string $model = AuvoCollaborator::class;
 
-    protected static ?string $modelLabel = 'Vistoria';
+    protected static ?string $modelLabel = 'Vistorias Interna';
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench';
 

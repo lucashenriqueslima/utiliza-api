@@ -8,13 +8,20 @@ use Illuminate\Support\Str;
 
 class AuthService
 {
-
-    public static function generateAuthenticationToken(): string
+    public function generateAuthenticationToken(): string
     {
         return (string) rand(1000, 9999);
     }
 
-    public static function maskEmail(string $email): string
+    public function saveMailAuthToken(Biker $partiner, string $authToken): void
+    {
+        $partiner->auth_token = $authToken;
+        $partiner->auth_token_verified = false;
+
+        $partiner->save();
+    }
+
+    public function maskEmail(string $email): string
     {
         $emailExploded = explode('@', $email);
         $emailExploded[0] = Str::of($emailExploded[0])->mask('*', 3);
@@ -22,26 +29,28 @@ class AuthService
         return implode('@', $emailExploded);
     }
 
-    public static function UpdateOrCreateBikerAndMotorcycle(LocavibeRenter $renter): Biker
+    public function updateOrCreatePartinerByLocavibeRenter(?LocavibeRenter $renter): ?Biker
     {
+
+        if (!$renter) {
+            return null;
+        }
 
         $biker = Biker::updateOrCreate(
             ['locavibe_biker_id' => $renter->id],
-            self::fillFieldsBiker($renter)
+            $this->fillFieldsBiker($renter)
         );
-
-        $biker->motorcycle()->updateOrCreate(
-            ['locavibe_motorcycle_id' => $renter->activationData['vehicle']['id']],
-            self::fillFieldsMotorcycle($renter)
-        );
-
-        $biker->geolocation()->delete();
-        $biker->geolocation()->create();
 
         return $biker;
     }
 
-    private static function fillFieldsBiker($renter): array
+    public function handlePartinerNewGeolocation(Biker $partiner)
+    {
+        $partiner->geolocation()->delete();
+        $partiner->geolocation()->create();
+    }
+
+    private function fillFieldsBiker($renter): array
     {
         return [
             'locavibe_biker_id' => $renter->id,
@@ -53,7 +62,7 @@ class AuthService
         ];
     }
 
-    private static function fillFieldsMotorcycle($renter): array
+    private function fillFieldsMotorcycle($renter): array
     {
         return [
             'locavibe_motorcycle_id' => $renter->activationData['vehicle']['id'],

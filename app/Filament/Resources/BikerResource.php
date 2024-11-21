@@ -2,12 +2,17 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Components\CpfTextInputComponent;
+use App\Filament\Forms\Components\EmailTextInputComponent;
+use App\Filament\Forms\Components\NameTextInputComponent;
+use App\Filament\Forms\Components\PhoneTextInputComponent;
 use App\Filament\Resources\BikerResource\Pages;
 use App\Filament\Resources\BikerResource\RelationManagers;
 use App\Helpers\FormatHelper;
 use App\Helpers\LinkGeneratorHelper;
 use App\Models\Biker;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -22,21 +27,23 @@ class BikerResource extends Resource
 {
     protected static ?string $model = Biker::class;
 
-    protected static ?string $modelLabel = 'Motoqueiros';
+    protected static ?string $modelLabel = 'Prestadores';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                NameTextInputComponent::make(),
+                CpfTextInputComponent::make(),
+                EmailTextInputComponent::make()
+                    ->columnSpanFull(),
+                PhoneTextInputComponent::make(),
+                TextInput::make('cnh')
+                    ->label('Código CNH')
+                    ->maxLength(255)
+                    ->required(),
             ]);
     }
 

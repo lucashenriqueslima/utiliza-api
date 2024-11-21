@@ -7,16 +7,9 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    protected $commands = [
-        \App\Console\Commands\AuvoCustomerUpdateCommand::class,
-        \App\Console\Commands\FieldControlCustomerUpdateCommand::class,
-    ];
+    protected $commands = [];
 
-    protected function schedule(Schedule $schedule)
-    {
-        $schedule->command('auvo-customer-update')->dailyAt('02:00');
-        $schedule->command('field-control-customer-update')->dailyAt('03:00');
-    }
+    protected function schedule(Schedule $schedule) {}
 
     protected function commands()
     {
