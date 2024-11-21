@@ -2,12 +2,15 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^3.2",
-        "cheesegrits/filament-google-maps": "^3.0",
+        "cheesegrits/filament-google-maps": "3.0.15",
         "filament/filament": "^3.2",
         "google/apiclient": "^2.15",
         "jenssegers/mongodb": "*",
