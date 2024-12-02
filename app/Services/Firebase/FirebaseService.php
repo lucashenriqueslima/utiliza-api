@@ -57,6 +57,7 @@ class FirebaseService
                         'time' => (string) Number::format($distanceInKm * 3.5, precision: 0),
                         'price' => (new CallValue())->getValidValueAttribute(),
                         'time_limit_to_accept' => $timeLimitToAcceptCallRequestInUTC,
+                        'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(25),
                     ],
                 ],
             ]);
