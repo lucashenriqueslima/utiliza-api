@@ -360,8 +360,7 @@ class CallResource extends Resource implements HasShieldPermissions
 
                         $distance = number_format($rawDistance[0]->distance / 1000, 1);
 
-
-                        return str_replace('.', ',', number_format($distance * 3.5) . " min ( " . $distance * 1.5 . " km)");
+                        return str_replace('.', ',', number_format($distance * 3.5) . " min (" . $distance * 1.5 . " km)");
                     }),
                 TextColumn::make('created_at')
                     ->label('Data de Criação')

@@ -22,6 +22,7 @@ use App\Models\AuvoWorkshop;
 use App\Models\Biker;
 use App\Models\Bill;
 use App\Models\Call;
+use App\Models\Dependent;
 use App\Models\PixKeyHistory;
 use Illuminate\Support\Collection;
 
@@ -94,6 +95,10 @@ Route::prefix('out-systems/v1')->group(function () {
 
         Route::get('/bikers', function () {
             return Biker::all();
+        });
+
+        Route::get('/dependents', function () {
+            return Dependent::all();
         });
 
         Route::post('auth/logout', [LogoutController::class, 'destroy']);

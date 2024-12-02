@@ -13,14 +13,20 @@ use App\Models\Associate;
 use App\Models\Biker;
 use App\Models\Call;
 use App\Models\CallRequest;
+use App\Services\BikerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Number;
 
 
 class CallRequestController extends Controller
 {
-    public function accept(Call $call, Biker $biker, CallRequest $callRequest, Request $request)
-    {
+    public function accept(
+        Call $call,
+        Biker $biker,
+        CallRequest $callRequest,
+        Request $request,
+        BikerService $bikerService
+    ) {
         // $request->validate([
         //     'app_version' => 'sometimes|string',
         // ]);
@@ -67,9 +73,7 @@ class CallRequestController extends Controller
             'estimated_time_arrival' => $estimatedTimeArrival,
         ]);
 
-        $biker->update([
-            'status' => BikerStatus::Busy->value
-        ]);
+        $bikerService->updateStatus($biker, BikerStatus::Busy);
 
         $call->with(['expertises' => function ($query) {
             $query->where('type', ExpertiseType::Secondary);

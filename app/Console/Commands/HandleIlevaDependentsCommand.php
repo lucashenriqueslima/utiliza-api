@@ -139,7 +139,7 @@ LEFT JOIN hbrd_adm_team hat ON hat.id = hac.id_equipe_
 LEFT JOIN hbrd_adm_sectional hasc ON hasc.id = hat.id_regional
 LEFT JOIN hbrd_adm_plan_item hapiv ON hapiv.id = hav.id_plan_item
 LEFT JOIN hbrd_adm_indication_termo hait ON hait.id_indicacao = hav.id_indicacao
-WHERE habv.id_beneficio IN (319,585, 42, 43, 50, 131, 175, 207, 237, 238, 267, 277, 280, 309, 310, 335, 366, 416, 425, 427, 688, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 127, 128, 525, 839)
+WHERE habv.id_beneficio IN (51, 52, 53, 811, 812, 813, 991, 992, 993, 995, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038,  319,585, 42, 43, 50, 131, 175, 207, 237, 238, 267, 277, 280, 309, 310, 335, 366, 416, 425, 427, 688, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 127, 128, 525, 839)
 AND hait.perguntas_contrato LIKE '%{[dependente%'
 ");
 
@@ -169,7 +169,7 @@ WHERE
     AND hai.classificacao = 'arquivada'
     AND hab.nome IS NOT NULL
     AND hait.perguntas_contrato IS NOT NULL
-    AND hab.id IN (319,585, 42, 43, 50, 131, 175, 207, 237, 238, 267, 277, 280, 309, 310, 335, 366, 416, 425, 427, 688, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 127, 128, 525, 839)
+    AND hab.id IN (51, 52, 53, 811, 812, 813, 991, 992, 993, 995, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038,  319,585, 42, 43, 50, 131, 175, 207, 237, 238, 267, 277, 280, 309, 310, 335, 366, 416, 425, 427, 688, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 127, 128, 525, 839)
 ");
 
         $ilevaAssociatesWithDependetsAfterContractArray = json_decode(json_encode($ilevaAssociatesWithDependetsAfterContract), true);

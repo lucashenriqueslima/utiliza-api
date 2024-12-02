@@ -24,9 +24,17 @@ class FirebaseService
         $this->client = Http::withHeaders($this->getHeaders());
     }
 
-    public function sendCallRequestPushNotification(Call $call, CallRequest $callRequest, Biker $biker, int|float $distanceInKm): void
-    {
+    public function sendCallRequestPushNotification(
+        Call $call,
+        CallRequest $callRequest,
+        Biker $biker,
+        int|float $distanceInKm,
+        string $timeLimitToAcceptCallRequestInUTC,
+    ): void {
         try {
+
+            Log::info($timeLimitToAcceptCallRequestInUTC);
+
             $response = $this->client->post($this->pushNotificationUri, [
                 'message' => [
                     'token' => $biker->firebase_token,
@@ -48,7 +56,7 @@ class FirebaseService
                         'distance' => Number::format($distanceInKm * 1.5, precision: 1),
                         'time' => (string) Number::format($distanceInKm * 3.5, precision: 0),
                         'price' => (new CallValue())->getValidValueAttribute(),
-                        'timeout_response' => (string) Carbon::createFromFormat('Y-m-d H:i:s', $callRequest->created_at)->addSeconds(25),
+                        'time_limit_to_accept' => $timeLimitToAcceptCallRequestInUTC,
                     ],
                 ],
             ]);

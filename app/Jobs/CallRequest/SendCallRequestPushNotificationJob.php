@@ -59,12 +59,16 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
         ]);
 
         try {
+            $timeLimitToAcceptCallRequest = Carbon::now()->addSeconds(26);
+
             $firebaseService->sendCallRequestPushNotification(
                 $this->call,
                 $this->callRequest,
                 $biker,
                 array_shift($this->distances) / 1000,
+                $timeLimitToAcceptCallRequest,
             );
+
 
             HandleCallContinuityAfterCallRequestJob::dispatch(
                 $this->call,
@@ -72,7 +76,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
                 $this->bikers,
                 $this->firebaseAccessToken,
                 $this->distances,
-            )->delay(now()->addSeconds(27));
+            )->delay(now()->addSeconds(30));
         } catch (\Exception $e) {
 
             Log::error($e->getMessage());
@@ -83,7 +87,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
                 $this->bikers,
                 $this->firebaseAccessToken,
                 $this->distances,
-            )->delay(now()->addSeconds(27));
+            )->delay(now()->addSeconds(30));
             Log::error($e->getMessage());
         }
     }

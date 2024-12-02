@@ -25,8 +25,7 @@ class HandleCallContinuityAfterCallRequestJob implements ShouldQueue
         protected Collection $bikers,
         protected string $firebaseAccessToken,
         protected array $distances,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
