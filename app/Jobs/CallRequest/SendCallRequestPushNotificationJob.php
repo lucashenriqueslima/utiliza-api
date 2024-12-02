@@ -87,7 +87,7 @@ class SendCallRequestPushNotificationJob implements ShouldQueue
                 $this->bikers,
                 $this->firebaseAccessToken,
                 $this->distances,
-            )->delay(now()->addSeconds(5));
+            )->delay(now()->addSeconds(30));
             Log::error($e->getMessage());
         }
     }
