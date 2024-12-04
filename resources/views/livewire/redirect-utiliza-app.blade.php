@@ -1,13 +1,9 @@
 <div>
+    <a href="utilizaApp://growth-utiliza.com/">My Facebook Group</a>
 </div>
-<script>
-    var w = (window.parent)?window.parent:window
-    w.location.assign("utilizaApp://growth-utiliza.com")
-</script>
-{{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
+{{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-{{-- @script
+@script
 <script>
 
 $wire.on('redirect-to-utiliza-app', (data) => {

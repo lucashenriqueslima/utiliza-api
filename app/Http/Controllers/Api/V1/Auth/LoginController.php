@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Enums\BikerStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MotorcycleResource;
 use App\Http\Resources\BikerResource;
@@ -25,7 +26,7 @@ class LoginController extends Controller
 
         try {
             $partiner = Biker::where('cpf', $request->cpf)
-                ->where('auth_token', $request->auth_token)
+                ->where('auth_token',   $request->auth_token)
                 ->where('auth_token_verified', false)
                 ->firstOrFail();
 
@@ -33,9 +34,11 @@ class LoginController extends Controller
 
             $partiner->auth_token_verified = true;
             $partiner->auth_token = null;
+            $partiner->status = BikerStatus::NotAvaible;
             $partiner->save();
 
             $authService->handlePartinerNewGeolocation($partiner);
+
 
             return response()->json(new BikerResource($partiner), 200);
         } catch (ModelNotFoundException $e) {
