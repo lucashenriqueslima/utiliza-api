@@ -33,6 +33,8 @@ Route::get('/', function () {
 });
 
 Route::post('/towing-providers', function (Request $request) {
+    dd($request->all());
+
     $towingProvider = new TowingProvider();
     $towingProvider->fantasy_name = $request->fantasy_name;
     $towingProvider->cnpj = $request->cnpj;
