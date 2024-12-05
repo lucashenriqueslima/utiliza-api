@@ -24,4 +24,23 @@ class BikerGeolocationService
             ]
         );
     }
+
+    public function getDistanceByBikerId(
+        float $latitude,
+        float $longitude,
+        string $bikerId
+    ): float {
+        $distance = DB::selectOne(
+            'SELECT ST_Distance_Sphere(POINT(?, ?), biker_geolocations.location) AS distance
+            FROM biker_geolocations
+            WHERE biker_geolocations.biker_id = ?',
+            [
+                $longitude,
+                $latitude,
+                $bikerId
+            ]
+        );
+
+        return $distance->distance;
+    }
 }

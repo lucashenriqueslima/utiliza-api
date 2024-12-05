@@ -24,10 +24,25 @@ use App\Models\Bill;
 use App\Models\Call;
 use App\Models\Dependent;
 use App\Models\PixKeyHistory;
+use App\Models\TowingProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 Route::get('/', function () {
     return ['Laravel' => app()->version()];
+});
+
+Route::post('/towing-providers', function (Request $request) {
+    $towingProvider = new TowingProvider();
+    $towingProvider->fantasy_name = $request->fantasy_name;
+    $towingProvider->cnpj = $request->cnpj;
+    $towingProvider->email = $request->email;
+    $towingProvider->phone = $request->phone;
+    $towingProvider->city = $request->city;
+    $towingProvider->uf = $request->uf;
+    $towingProvider->save();
+
+    return $towingProvider;
 });
 
 Route::prefix('auvo')->group(function () {
@@ -53,6 +68,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('/biker/{biker}/firebase-token', [BikerController::class, 'updateFirebaseToken']);
 
         Route::put('/biker/{id}/geolocation', [BikerGeolocationController::class, 'update']);
+
+        Route::post('/call/{encryptedKey}/biker/{biker}/call-request', [CallRequestController::class, 'store']);
 
         Route::post('/call/{call}/biker/{biker}/call-request/{callRequest}/accept', [CallRequestController::class, 'accept']);
 

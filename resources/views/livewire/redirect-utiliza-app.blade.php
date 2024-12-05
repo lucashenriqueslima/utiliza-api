@@ -1,7 +1,11 @@
 <div>
-    <a href="utilizaApp://growth-utiliza.com/">My Facebook Group</a>
+    <a href="apputiliza://growth-utiliza.com">My Facebook Group</a>
 </div>
-{{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 @script
 <script>
@@ -11,16 +15,15 @@ $wire.on('redirect-to-utiliza-app', (data) => {
 
     window.location.href = "utilizaApp://growth-utiliza.com";
 
-    setTimeout(function () {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Você não possui o aplicativo instalado em seu dispositivo.',
+    Swal.fire({
+            icon: 'success',
+            title: 'Sucesso',
+            text: 'Clique no botão abaixo para acessar o aplicativo',
+            footer: '<a href="apputiliza://growth-utiliza.com"> Acessar Chamado</a>'
             showCancelButton: false,
             showConfirmButton: false,
             allowOutsideClick: false
         })
-    }, 2500);
 
 })
 
@@ -39,4 +42,4 @@ $wire.on('show-error-alert', (data) => {
 
 
 </script>
-@endscript --}}
+@endscript
