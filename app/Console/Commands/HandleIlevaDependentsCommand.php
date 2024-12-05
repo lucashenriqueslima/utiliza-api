@@ -36,13 +36,25 @@ class HandleIlevaDependentsCommand extends Command
 
             $associate = $this->updateOrCreateDependentAssociate($ilevaAssociteWithDependents);
 
-            $dependents = array_filter($contractQuestions, function ($item) {
-                return str_starts_with($item['variavel'], '{[dependente')
-                    && strlen($item['resposta']) > 6
-                    && preg_match('/[a-zA-Z]/', $item['resposta'])
-                    && stripos($item['resposta'], 'não') === false
-                    && stripos($item['resposta'], 'nao') === false;
-            });
+            if (str_contains($ilevaAssociteWithDependents['beneficio'], 'AUPET')) {
+                $dependents = array_filter($contractQuestions, function ($item) {
+                    return str_starts_with($item['variavel'], '{[dependente')
+                        && preg_match('/[a-zA-Z]/', $item['resposta'])
+                        && stripos($item['resposta'], 'não') === false
+                        && stripos($item['resposta'], 'nao') === false;
+                });
+            } else {
+                $dependents = array_filter($contractQuestions, function ($item) {
+                    return str_starts_with($item['variavel'], '{[dependente')
+                        && strlen($item['resposta']) > 6
+                        && preg_match('/[a-zA-Z]/', $item['resposta'])
+                        && stripos($item['resposta'], 'não') === false
+                        && stripos($item['resposta'], 'nao') === false;
+                });
+            }
+
+
+
 
             foreach ($dependents as $dependent) {
                 $associate->dependents()->updateOrCreate(
@@ -151,7 +163,10 @@ SELECT
 hai.nome as associado,
 hai.create_at as contract_date,
 hai.cpf_cnpj as cpf,
-IFNULL(hab.nome, hap.nome) AS beneficio,
+CASE
+	WHEN hap.nome = 'PLANO AUPET HEINSTEN - VITAL (39,90)' THEN 'PLANO AUPET HEINSTEN - VITAL (39,90)'
+	ELSE IFNULL(hab.nome, hap.nome)
+END beneficio,
 hait.perguntas_contrato,
 hai.telefone tel_celular,
 hai.email,
