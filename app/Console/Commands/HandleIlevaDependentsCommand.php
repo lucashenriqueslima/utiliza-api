@@ -164,7 +164,7 @@ hai.nome as associado,
 hai.create_at as contract_date,
 hai.cpf_cnpj as cpf,
 CASE
-	WHEN hap.nome = 'PLANO AUPET HEINSTEN - VITAL (39,90)' THEN 'PLANO AUPET HEINSTEN - VITAL (39,90)'
+	WHEN (hap.nome = 'PLANO AUPET HEINSTEN - VITAL (39,90)' AND hab.nome = 'FUTURA ASSISTÊNCIA + 3 Dependentes') THEN 'PLANO AUPET HEINSTEN - VITAL (39,90)'
 	ELSE IFNULL(hab.nome, hap.nome)
 END beneficio,
 hait.perguntas_contrato,
