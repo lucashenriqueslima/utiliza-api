@@ -37,7 +37,7 @@ Route::post('/towing-providers', function (Request $request) {
 
     //return $request->all(); json
 
-    return $request->all();
+    return response()->json($request->all(), 201);
 
     $towingProvider = new TowingProvider();
     $towingProvider->fantasy_name = $request->fantasy_name;
