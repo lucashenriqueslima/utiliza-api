@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\ExpertiseFileValidationErrorController;
 use App\Http\Controllers\Api\V1\FipeBrandController;
 use App\Http\Controllers\Api\V1\PixKeyController;
 use App\Http\Controllers\BikerChangeCallController;
+use App\Http\Controllers\TowingProviderController;
 use App\Models\Accident;
 use App\Models\AuvoWorkshop;
 use App\Models\Biker;
@@ -32,24 +33,7 @@ Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
-Route::post('/towing-providers', function (Request $request) {
-    // dd($request->all());
-
-    //return $request->all(); json
-
-    return response()->json($request->all(), 201);
-
-    $towingProvider = new TowingProvider();
-    $towingProvider->fantasy_name = $request->fantasy_name;
-    $towingProvider->cnpj = $request->cnpj;
-    $towingProvider->email = $request->email;
-    $towingProvider->phone = $request->phone;
-    $towingProvider->city = $request->city;
-    $towingProvider->uf = $request->uf;
-    $towingProvider->save();
-
-    return $towingProvider;
-});
+Route::post('/towing-providers', [TowingProviderController::class, 'store']);
 
 Route::prefix('auvo')->group(function () {
     Route::get('/workshops', function (): Collection {
