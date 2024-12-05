@@ -33,7 +33,11 @@ Route::get('/', function () {
 });
 
 Route::post('/towing-providers', function (Request $request) {
-    dd($request->all());
+    // dd($request->all());
+
+    //return $request->all(); json
+
+    return $request->all();
 
     $towingProvider = new TowingProvider();
     $towingProvider->fantasy_name = $request->fantasy_name;
