@@ -191,14 +191,14 @@ WHERE
         $ilevaSolidyAssociatesWithDependetsAupetBenefit = DB::connection('ileva')
             ->select('
                 SELECT
-hai.nome as associado,
-hai.create_at as contract_date,
-hai.cpf_cnpj as cpf,
+hap.nome as associado,
+hap.create_at contract_date,
+hap.cpf as cpf,
 hab.nome beneficio,
 hait.perguntas_contrato,
-hai.telefone tel_celular,
-hai.email,
-"solidy" AS association,
+hap.tel_celular tel_celular,
+hap.email,
+"solidy" AS association
 FROM hbrd_asc_veiculo hav
 LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
 LEFT JOIN hbrd_asc_pessoa hap on hap.id = haa.id_pessoa
@@ -214,6 +214,7 @@ LEFT JOIN hbrd_adm_plan_item hapiv  on hapiv.id = hav.id_plan_item
 LEFT JOIN hbrd_adm_indication hai on hai.id = hav.id_indicacao
 LEFT JOIN hbrd_adm_indication_termo hait on hait.id = hai.id_termo
 WHERE hav.id_situacao = "1"
+AND hait.perguntas_contrato IS NOT NULL
 AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
 ');
 
@@ -222,14 +223,14 @@ AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
 
         $ilevaMotoclubAssociatesWithDependetsAupetBenefit = DB::connection('ileva_motoclub')
             ->select('
-                                SELECT
-hai.nome as associado,
-hai.create_at as contract_date,
-hai.cpf_cnpj as cpf,
+                                                SELECT
+hap.nome as associado,
+hap.create_at contract_date,
+hap.cpf as cpf,
 hab.nome beneficio,
 hait.perguntas_contrato,
-hai.telefone tel_celular,
-hai.email,
+hap.tel_celular tel_celular,
+hap.email,
 "motoclub" AS association
 FROM hbrd_asc_veiculo hav
 LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
@@ -246,6 +247,7 @@ LEFT JOIN hbrd_adm_plan_item hapiv  on hapiv.id = hav.id_plan_item
 LEFT JOIN hbrd_adm_indication hai on hai.id = hav.id_indicacao
 LEFT JOIN hbrd_adm_indication_termo hait on hait.id = hai.id_termo
 WHERE hav.id_situacao = "1"
+AND hait.perguntas_contrato IS NOT NULL
 AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
             ');
 
