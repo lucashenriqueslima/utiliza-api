@@ -191,34 +191,14 @@ WHERE
         $ilevaSolidyAssociatesWithDependetsAupetBenefit = DB::connection('ileva')
             ->select('
                 SELECT
-hav.id,
-hav.id_associado,
-hap.nome as associado,
-hav.id_plan_item,
-hapiv.id_plan,
-hapiv.val_mensal as valor_plan,
-hav.id_situacao,
-has.nome as situacao,
-hav.id_consultor,
-hac.nome as consultor,
-hat.equipe,
-hasc.nome as regional,
-hav.placa,
-hav.chassi,
-hav.dt_contrato,
-hmuc.cidade,
-hmus.estado,
-hmus.uf,
-habv.id_beneficio,
-CONCAT("SOLIDY_", habv.id_beneficio) AS assoc_id_beneficio,
-habv.id_veiculo,
-habv.created_at,
-habv.valor_beneficio,
-hab.nome as beneficio,
-hab.valor,
-hab.delete_at as delet_banco_dados,
+hai.nome as associado,
+hai.create_at as contract_date,
+hai.cpf_cnpj as cpf,
+hab.nome beneficio,
 hait.perguntas_contrato,
-"Solidy" as Associacao
+hai.telefone tel_celular,
+hai.email,
+"solidy" AS association,
 FROM hbrd_asc_veiculo hav
 LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
 LEFT JOIN hbrd_asc_pessoa hap on hap.id = haa.id_pessoa
@@ -243,34 +223,14 @@ AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
         $ilevaMotoclubAssociatesWithDependetsAupetBenefit = DB::connection('ileva_motoclub')
             ->select('
                                 SELECT
-hav.id,
-hav.id_associado,
-hap.nome as associado,
-hav.id_plan_item,
-hapiv.id_plan,
-hapiv.val_mensal as valor_plan,
-hav.id_situacao,
-has.nome as situacao,
-hav.id_consultor,
-hac.nome as consultor,
-hat.equipe,
-hasc.nome as regional,
-hav.placa,
-hav.chassi,
-hav.dt_contrato,
-hmuc.cidade,
-hmus.estado,
-hmus.uf,
-habv.id_beneficio,
-CONCAT("SOLIDY_", habv.id_beneficio) AS assoc_id_beneficio,
-habv.id_veiculo,
-habv.created_at,
-habv.valor_beneficio,
-hab.nome as beneficio,
-hab.valor,
-hab.delete_at as delet_banco_dados,
+hai.nome as associado,
+hai.create_at as contract_date,
+hai.cpf_cnpj as cpf,
+hab.nome beneficio,
 hait.perguntas_contrato,
-"Solidy" as Associacao
+hai.telefone tel_celular,
+hai.email,
+"motoclub" AS association
 FROM hbrd_asc_veiculo hav
 LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
 LEFT JOIN hbrd_asc_pessoa hap on hap.id = haa.id_pessoa
