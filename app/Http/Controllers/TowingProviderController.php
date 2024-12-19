@@ -11,7 +11,7 @@ class TowingProviderController extends Controller
     {
         return request()->json(
             $request->all(),
-        )
+        );
 
         $towingProvider = new TowingProvider();
         $towingProvider->fantasy_name = $request->fantasy_name;

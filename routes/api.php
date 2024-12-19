@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OutSystem\V1\AupetController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\OutSystem\V1\Auth\LoginController as OutSystemLoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
@@ -26,6 +27,7 @@ use App\Models\Call;
 use App\Models\Dependent;
 use App\Models\PixKeyHistory;
 use App\Models\TowingProvider;
+use App\Services\Asaas\AupetAsaasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -85,6 +87,10 @@ Route::prefix('v1')->group(function () {
 Route::prefix('out-systems/v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/login', [OutSystemLoginController::class, 'store']);
+    });
+
+    Route::prefix('aupet')->group(function () {
+        Route::get('has-benefit-active/{cpf}', [AupetController::class, 'associateHasAupetBenefitActive']);
     });
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
