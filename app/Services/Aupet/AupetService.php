@@ -6,12 +6,14 @@ use Illuminate\Support\Facades\DB;
 
 class AupetService
 {
-    public function associateHasAupetBenefitActive(string $cpf): bool
+    public static function getCustomerInIlevaSolidyDatabase(string $cpf): array
     {
-        $associate = DB::connection('ileva')
+        return DB::connection('ileva')
             ->select("
             SELECT
-            hap.cpf as cpf
+            hap.nome,
+            hap.email,
+            hap.tel_celular phone_number
             FROM hbrd_asc_veiculo hav
             LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
             LEFT JOIN hbrd_asc_pessoa hap on hap.id = haa.id_pessoa
@@ -21,12 +23,7 @@ class AupetService
             WHERE hav.id_situacao = '1'
             AND hap.cpf = '$cpf'
             AND hab.id IN (51,52,53,811,812,813,991,992,993,995,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038)
+            GROUP BY hap.id
         ");
-
-        if (empty($associate)) {
-            return false;
-        }
-
-        return true;
     }
 }

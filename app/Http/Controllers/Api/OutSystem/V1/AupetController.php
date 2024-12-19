@@ -18,24 +18,18 @@ class AupetController extends Controller
 {
     public function associateHasAupetBenefitActive(
         string $cpf,
-        AupetAsaasService $aupetAsaasService,
-        AupetService $aupetService,
     ) {
 
-        $asaas = $aupetAsaasService->associateHasAupetBenefitActive($cpf);
-        $solidyAupet = $aupetService->associateHasAupetBenefitActive($cpf);
+        $asaas = AupetAsaasService::getCustomer($cpf);
+        $solidyAupet = AupetService::getCustomerInIlevaSolidyDatabase($cpf);
 
-        if (!in_array(true, [$asaas, $solidyAupet])) {
+        if (empty($solidyAupet) && empty($asaas)) {
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Associado não possui benefício AUPET',
-            ], 404);
+            return response()->json([], 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Associado possui benefício AUPET',
-        ]);
+        return response()->json(
+            $solidyAupet[0] ?? $asaas
+        );
     }
 }
