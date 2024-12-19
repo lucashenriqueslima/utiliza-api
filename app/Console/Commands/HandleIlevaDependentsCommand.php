@@ -32,18 +32,25 @@ class HandleIlevaDependentsCommand extends Command
 
         foreach ($ilevaAssocitesWithDependents as $ilevaAssociteWithDependents) {
 
-            $contractQuestions = json_decode($ilevaAssociteWithDependents['perguntas_contrato'], true);
 
             $associate = $this->updateOrCreateDependentAssociate($ilevaAssociteWithDependents);
 
-            if (str_contains($ilevaAssociteWithDependents['beneficio'], 'AUPET')) {
+            if (
+                str_contains($ilevaAssociteWithDependents['beneficio'], 'AUPET')
+                && !empty($ilevaAssociteWithDependents['perguntas_contrato'])
+            ) {
+
+                $contractQuestions = json_decode($ilevaAssociteWithDependents['perguntas_contrato'], true);
+
                 $dependents = array_filter($contractQuestions, function ($item) {
-                    return str_starts_with($item['variavel'], '{[dependente')
-                        && preg_match('/[a-zA-Z]/', $item['resposta'])
-                        && stripos($item['resposta'], 'não') === false
-                        && stripos($item['resposta'], 'nao') === false;
+                    return str_starts_with($item['variavel'], '{[dependente');
                 });
-            } else {
+            } else if (
+                !str_contains($ilevaAssociteWithDependents['beneficio'], 'AUPET')
+            ) {
+
+                $contractQuestions = json_decode($ilevaAssociteWithDependents['perguntas_contrato'], true);
+
                 $dependents = array_filter($contractQuestions, function ($item) {
                     return str_starts_with($item['variavel'], '{[dependente')
                         && strlen($item['resposta']) > 6
@@ -51,6 +58,16 @@ class HandleIlevaDependentsCommand extends Command
                         && stripos($item['resposta'], 'não') === false
                         && stripos($item['resposta'], 'nao') === false;
                 });
+            } else {
+                $dependents = [
+                    [
+                        'resposta' => 'Termo não encontrado',
+                        'association' => $ilevaAssociteWithDependents['association'],
+                        'benefit' => $ilevaAssociteWithDependents['beneficio'],
+                        'contract_date' => $ilevaAssociteWithDependents['contract_date'],
+                        'situation' => $ilevaAssociteWithDependents['situacao'],
+                    ]
+                ];
             }
 
 
@@ -190,32 +207,36 @@ WHERE
 
         $ilevaSolidyAssociatesWithDependetsAupetBenefit = DB::connection('ileva')
             ->select('
-                SELECT
+SELECT
 hap.nome as associado,
 hap.create_at contract_date,
 hap.cpf as cpf,
-hab.nome beneficio,
-hait.perguntas_contrato,
+UPPER(hab.nome) beneficio,
 hap.tel_celular tel_celular,
 hap.email,
-"solidy" AS association
+has.nome situacao,
+"solidy" association,
+(SELECT
+hait2.perguntas_contrato
+FROM  hbrd_adm_indication hai2
+LEFT JOIN hbrd_adm_indication_termo hait2 ON hait2.id_indicacao = hai2.id
+WHERE REGEXP_REPLACE(hai2.cpf_cnpj, "[^0-9]", "") = hap.cpf
+AND hai2.modelo = "AUPET"
+AND hai2.classificacao = "arquivada"
+AND hait2.`status` = "aprovada"
+LIMIT 1
+) perguntas_contrato
 FROM hbrd_asc_veiculo hav
+LEFT JOIN hbrd_asc_situacao has ON has.id = hav.id_situacao
 LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
 LEFT JOIN hbrd_asc_pessoa hap on hap.id = haa.id_pessoa
-LEFT JOIN hbrd_asc_situacao has on has.id = hav.id_situacao
-LEFT JOIN hbrd_main_util_city hmuc on hmuc.id = hap.id_cidade
-LEFT JOIN hbrd_main_util_state hmus on hmus.id = hmuc.id_estado
 LEFT JOIN hbrd_asc_beneficio_veiculo habv on habv.id_veiculo = hav.id
 LEFT JOIN hbrd_adm_benefit hab ON hab.id = habv.id_beneficio
-LEFT JOIN hbrd_adm_consultant hac on hac.id = hav.id_consultor
-LEFT JOIN hbrd_adm_team hat on hat.id = hac.id_equipe_
-LEFT JOIN hbrd_adm_sectional hasc on hasc.id = hat.id_regional
-LEFT JOIN hbrd_adm_plan_item hapiv  on hapiv.id = hav.id_plan_item
 LEFT JOIN hbrd_adm_indication hai on hai.id = hav.id_indicacao
 LEFT JOIN hbrd_adm_indication_termo hait on hait.id = hai.id_termo
 WHERE hav.id_situacao = "1"
-AND hait.perguntas_contrato IS NOT NULL
-AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
+AND hab.nome LIKE "%AUPET%"
+GROUP BY hap.id
 ');
 
         $ilevaSolidyAssociatesWithDependetsAupetBenefitArray = json_decode(json_encode($ilevaSolidyAssociatesWithDependetsAupetBenefit), true);
@@ -223,32 +244,36 @@ AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
 
         $ilevaMotoclubAssociatesWithDependetsAupetBenefit = DB::connection('ileva_motoclub')
             ->select('
-                                                SELECT
+SELECT
 hap.nome as associado,
 hap.create_at contract_date,
 hap.cpf as cpf,
-hab.nome beneficio,
-hait.perguntas_contrato,
+UPPER(hab.nome) beneficio,
 hap.tel_celular tel_celular,
 hap.email,
-"motoclub" AS association
+has.nome situacao,
+"motoclub" association,
+(SELECT
+hait2.perguntas_contrato
+FROM  hbrd_adm_indication hai2
+LEFT JOIN hbrd_adm_indication_termo hait2 ON hait2.id_indicacao = hai2.id
+WHERE REGEXP_REPLACE(hai2.cpf_cnpj, "[^0-9]", "") = hap.cpf
+AND hai2.modelo = "AUPET"
+AND hai2.classificacao = "arquivada"
+AND hait2.`status` = "aprovada"
+LIMIT 1
+) perguntas_contrato
 FROM hbrd_asc_veiculo hav
+LEFT JOIN hbrd_asc_situacao has ON has.id = hav.id_situacao
 LEFT JOIN hbrd_asc_associado haa on haa.id = hav.id_associado
 LEFT JOIN hbrd_asc_pessoa hap on hap.id = haa.id_pessoa
-LEFT JOIN hbrd_asc_situacao has on has.id = hav.id_situacao
-LEFT JOIN hbrd_main_util_city hmuc on hmuc.id = hap.id_cidade
-LEFT JOIN hbrd_main_util_state hmus on hmus.id = hmuc.id_estado
 LEFT JOIN hbrd_asc_beneficio_veiculo habv on habv.id_veiculo = hav.id
 LEFT JOIN hbrd_adm_benefit hab ON hab.id = habv.id_beneficio
-LEFT JOIN hbrd_adm_consultant hac on hac.id = hav.id_consultor
-LEFT JOIN hbrd_adm_team hat on hat.id = hac.id_equipe_
-LEFT JOIN hbrd_adm_sectional hasc on hasc.id = hat.id_regional
-LEFT JOIN hbrd_adm_plan_item hapiv  on hapiv.id = hav.id_plan_item
 LEFT JOIN hbrd_adm_indication hai on hai.id = hav.id_indicacao
 LEFT JOIN hbrd_adm_indication_termo hait on hait.id = hai.id_termo
 WHERE hav.id_situacao = "1"
-AND hait.perguntas_contrato IS NOT NULL
-AND LOWER(hab.nome) LIKE "%aupet%" OR LOWER(hab.nome) LIKE "%au pet%"
+AND hab.nome LIKE "%AUPET%"
+GROUP BY hap.id
             ');
 
         $ilevaMotoclubAssociatesWithDependetsAupetBenefitArray = json_decode(json_encode($ilevaMotoclubAssociatesWithDependetsAupetBenefit), true);
