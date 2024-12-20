@@ -28,6 +28,13 @@ class AupetController extends Controller
             return response()->json([], 404);
         }
 
+        if (!empty($solidyAupet)) {
+            $solidyAupet[0]['activated'] = true;
+            return response()->json(
+                $solidyAupet[0]
+            );
+        }
+
         return response()->json(
             $solidyAupet[0] ?? $asaas
         );

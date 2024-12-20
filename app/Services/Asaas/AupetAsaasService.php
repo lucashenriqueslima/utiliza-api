@@ -36,9 +36,9 @@ class AupetAsaasService
                 'name' => $response->json()['data'][0]['name'],
                 'phone_number' => $response->json()['data'][0]['mobilePhone'],
                 'email' => $response->json()['data'][0]['email'],
+                'activated' => true,
             ];
         } catch (\Exception $e) {
-            dd($e);
             throw new \Exception('Falha ao buscar dados do cliente');
         }
     }
