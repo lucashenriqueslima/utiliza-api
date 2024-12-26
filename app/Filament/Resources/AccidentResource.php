@@ -127,6 +127,15 @@ class AccidentResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\Action::make('edit_status')
+                    //     ->label('Editar Status')
+                    //     ->color('warning')
+                    //     ->form([
+                    //         Select::make('status')
+                    //             ->label('Status')
+                    //             ->options(AccidentStatus::class)
+                    //             ->required(),
+                    //     ]),
                 ]),
             ])
             ->recordUrl(null)

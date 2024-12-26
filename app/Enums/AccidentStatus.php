@@ -12,12 +12,15 @@ enum AccidentStatus: string implements HasLabel, HasColor, HasIcon
     case InProgress = 'in_progress';
     case Finished = 'finished';
 
+    case Cancelled = 'cancelled';
+
     public function getLabel(): string
     {
         return match ($this) {
             self::Pending => 'Pendente',
             self::InProgress => 'Em andamento',
             self::Finished => 'Finalizado',
+            self::Cancelled => 'Cancelado',
         };
     }
 
@@ -27,6 +30,7 @@ enum AccidentStatus: string implements HasLabel, HasColor, HasIcon
             self::Pending => 'danger',
             self::InProgress => 'info',
             self::Finished => 'success',
+            self::Cancelled => 'danger',
         };
     }
 
@@ -37,6 +41,7 @@ enum AccidentStatus: string implements HasLabel, HasColor, HasIcon
             self::Pending => 'heroicon-o-exclamation-triangle',
             self::InProgress => 'heroicon-o-camera',
             self::Finished => 'heroicon-o-check',
+            self::Cancelled => 'heroicon-o-x',
         };
     }
 }

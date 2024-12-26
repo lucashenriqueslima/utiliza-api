@@ -29,7 +29,7 @@ class AupetController extends Controller
         }
 
         if (!empty($solidyAupet)) {
-            $solidyAupet[0]['activated'] = true;
+            $solidyAupet[0]->activated = true;
             return response()->json(
                 $solidyAupet[0]
             );
