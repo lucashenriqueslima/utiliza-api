@@ -43,7 +43,8 @@ class HandleIlevaDependentsCommand extends Command
                 $contractQuestions = json_decode($ilevaAssociteWithDependents['perguntas_contrato'], true);
 
                 $dependents = array_filter($contractQuestions, function ($item) {
-                    return str_starts_with($item['variavel'], '{[dependente');
+                    return str_starts_with($item['variavel'], '{[dependente')
+                        && strlen($item['resposta']) > 2;
                 });
             } else if (
                 !str_contains($ilevaAssociteWithDependents['beneficio'], 'AUPET')
