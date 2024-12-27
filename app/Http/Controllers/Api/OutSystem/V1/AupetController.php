@@ -20,23 +20,18 @@ class AupetController extends Controller
         string $cpf,
     ) {
 
-        $asaas = AupetAsaasService::getCustomer($cpf);
-        $solidyAupet = AupetService::getCustomerInIlevaSolidyDatabase($cpf);
+        [$aupet, $solidyAupet] = Octane::concurrently([
+            fn() => AupetService::getCustomerInAupetDatabase($cpf),
+            fn() => AupetService::getCustomerInIlevaSolidyDatabase($cpf),
+        ]);
 
-        if (empty($solidyAupet) && empty($asaas)) {
+        if (empty($solidyAupet) && empty($aupet)) {
 
             return response()->json([], 404);
         }
 
-        if (!empty($solidyAupet)) {
-            $solidyAupet[0]->activated = true;
-            return response()->json(
-                $solidyAupet[0]
-            );
-        }
-
         return response()->json(
-            $solidyAupet[0] ?? $asaas
+            $aupet[0] ?? $solidyAupet[0]
         );
     }
 }
