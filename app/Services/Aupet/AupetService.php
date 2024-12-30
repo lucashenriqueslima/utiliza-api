@@ -26,6 +26,10 @@ class AupetService
             GROUP BY hap.id
         ");
 
+        if (empty($aupetCustomer)) {
+            return [];
+        }
+
         $aupetCustomer[0]->activated = true;
 
         return $aupetCustomer;
