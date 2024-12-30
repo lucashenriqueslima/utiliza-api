@@ -8,10 +8,10 @@ class AupetService
 {
     public static function getCustomerInIlevaSolidyDatabase(string $cpf): array
     {
-        return DB::connection('ileva')
+        $aupetCustomer = DB::connection('ileva')
             ->select("
             SELECT
-            hap.nome,
+            hap.nome name,
             hap.email,
             hap.tel_celular phone_number
             FROM hbrd_asc_veiculo hav
@@ -25,6 +25,10 @@ class AupetService
             AND hab.id IN (51,52,53,811,812,813,991,992,993,995,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038)
             GROUP BY hap.id
         ");
+
+        $aupetCustomer[0]->activated = true;
+
+        return $aupetCustomer;
     }
 
     public static function getCustomerInAupetDatabase(string $cpf): array
@@ -35,11 +39,9 @@ class AupetService
         $aupetCustomer = DB::connection('ileva_aupet')
             ->select("
                 SELECT
-    hap.id AS pessoa_id,
-    hap.cpf,
-    hap.nome AS pessoa_nome,
-    haa.id AS associado_id,
-    hapr.id AS proposta_id,
+    hap.nome name,
+    hap.email,
+    hap.telefone phone_number,
     IF(hape_proposta.classificacao = 'ativada' OR hape_associado.classificacao = 'ativada', 'true', 'false') activated,
     JSON_ARRAYAGG(
         JSON_OBJECT(
